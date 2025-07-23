@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIU Financial Dashboard 2024-2025</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        .alert-banner {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .alert-banner h3 {
+            color: #155724;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .alert-banner p {
+            color: #155724;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .semester-section {
+            margin-bottom: 40px;
+        }
+
+        .semester-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #3498db;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .semester-header h2 {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .performance-badge {
+            display: flex;
+            gap: 15px;
+        }
+
+        .badge-item {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-item.good {
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+
+        .badge-item.warning {
+            color: #f39c12;
+            border: 1px solid #f39c12;
+        }
+
+        .badge-item.poor {
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        .semester-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #3498db;
+        }
+
+        .metric-card.lusd::before {
+            background: #3498db;
+        }
+
+        .metric-card.cusd::before {
+            background: #9b59b6;
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .metric-title {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .currency-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .currency-badge.lusd {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .currency-badge.cusd {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .metric-subtitle {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.good {
+            background: #27ae60;
+        }
+
+        .progress-fill.warning {
+            background: #f39c12;
+        }
+
+        .progress-fill.poor {
+            background: #e74c3c;
+        }
+
+        .kpi-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+            transition: transform 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .kpi-card.revenue { border-color: #9b59b6; }
+        .kpi-card.fa { border-color: #e74c3c; }
+        .kpi-card.collections { border-color: #27ae60; }
+        .kpi-card.outstanding { border-color: #f39c12; }
+        .kpi-card.expenses { border-color: #e67e22; }
+        .kpi-card.result { border-color: #16a085; }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .kpi-title {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .kpi-icon.revenue { background: #9b59b6; }
+        .kpi-icon.fa { background: #e74c3c; }
+        .kpi-icon.collections { background: #27ae60; }
+        .kpi-icon.outstanding { background: #f39c12; }
+        .kpi-icon.expenses { background: #e67e22; }
+        .kpi-icon.result { background: #16a085; }
+
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .kpi-value.positive {
+            color: #27ae60;
+        }
+
+        .kpi-value.negative {
+            color: #e74c3c;
+        }
+
+        .kpi-change {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #7f8c8d;
+        }
+
+        .trend-indicator {
+            display: inline-block;
+            margin-left: 10px;
+            font-size: 1.2rem;
+        }
+
+        .trend-up {
+            color: #27ae60;
+        }
+
+        .trend-down {
+            color: #e74c3c;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .gauge-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 400px;
+        }
+
+        .gauge-item {
+            text-align: center;
+        }
+
+        .gauge-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .gauge-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .waterfall-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .data-table .number {
+            text-align: right;
+        }
+
+        .positive { color: #27ae60; font-weight: 600; }
+        .negative { color: #e74c3c; font-weight: 600; }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .kpi-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .semester-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>LIU Financial Dashboard</h1>
+            <p class="subtitle">Financial Performance Analysis by Semester • LUSD & CUSD • Academic Year 2024-2025</p>
+        </div>
+
+        <!-- Financial Alert -->
+        <div class="alert-banner">
+            <h3>✅ Strong Operating Result</h3>
+            <p>Operating surplus of $27.90M. Net revenue after FA ($51.39M) exceeds expenses ($23.49M).</p>
+        </div>
+
+        <!-- Overall KPIs -->
+        <div class="kpi-section">
+            <div class="kpi-card revenue">
+                <div class="kpi-header">
+                    <div class="kpi-title">Total Expected Revenue</div>
+                    <div class="kpi-icon revenue">💰</div>
+                </div>
+                <div class="kpi-value">$96.19M</div>
+                <div class="kpi-change">LUSD: $30.48M | CUSD: $65.71M</div>
+            </div>
+
+            <div class="kpi-card fa">
+                <div class="kpi-header">
+                    <div class="kpi-title">Financial Aid</div>
+                    <div class="kpi-icon fa">🎓</div>
+                </div>
+                <div class="kpi-value">$44.80M</div>
+                <div class="kpi-change">46.6% of revenue</div>
+            </div>
+
+            <div class="kpi-card collections">
+                <div class="kpi-header">
+                    <div class="kpi-title">Total Collections</div>
+                    <div class="kpi-icon collections">💵</div>
+                </div>
+                <div class="kpi-value">$66.82M</div>
+                <div class="kpi-change">69.5% collection rate</div>
+            </div>
+
+            <div class="kpi-card outstanding">
+                <div class="kpi-header">
+                    <div class="kpi-title">Total Outstanding</div>
+                    <div class="kpi-icon outstanding">📊</div>
+                </div>
+                <div class="kpi-value">$29.37M</div>
+                <div class="kpi-change">30.5% uncollected</div>
+            </div>
+
+            <div class="kpi-card expenses">
+                <div class="kpi-header">
+                    <div class="kpi-title">Operating Expenses</div>
+                    <div class="kpi-icon expenses">💸</div>
+                </div>
+                <div class="kpi-value">$23.49M</div>
+                <div class="kpi-change">Oct 2024 - June 2025</div>
+            </div>
+
+            <div class="kpi-card result">
+                <div class="kpi-header">
+                    <div class="kpi-title">Operating Result</div>
+                    <div class="kpi-icon result">✅</div>
+                </div>
+                <div class="kpi-value positive">+$27.90M</div>
+                <div class="kpi-change">Surplus after expenses</div>
+            </div>
+        </div>
+
+        <!-- Semester Sections -->
+        <div id="semesterSections"></div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-card full-width">
+                <h3 class="chart-title">Revenue Waterfall Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="waterfallChart"></canvas>
+                </div>
+                <div class="waterfall-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3498db;"></div>
+                        <span>Revenue</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #e74c3c;"></div>
+                        <span>Deduction</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #27ae60;"></div>
+                        <span>Net Result</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="chart-title">Collection Performance by Semester</h3>
+                <div class="chart-container">
+                    <canvas id="collectionPerformanceChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="chart-title">Top Expense Categories</h3>
+                <div class="chart-container">
+                    <canvas id="expenseCategoriesChart"></canvas>
+                </div>
+            </div>
+
+
+            <div class="chart-card">
+                <h3 class="chart-title">Outstanding Balance Heatmap</h3>
+                <div class="chart-container">
+                    <canvas id="heatmapChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="chart-title">Currency Mix Analysis</h3>
+                <div class="chart-container">
+                    <canvas id="currencyMixChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Table -->
+        <div class="chart-card">
+            <h3 class="chart-title">Financial Summary</h3>
+            <table class="data-table">
+                <tr>
+                    <td><strong>Total Expected Revenue</strong></td>
+                    <td class="number"><strong>$96,186,522</strong></td>
+                </tr>
+                <tr>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;LUSD Component</td>
+                    <td class="number">$30,477,985</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;CUSD Component</td>
+                    <td class="number">$65,708,537</td>
+                </tr>
+                <tr>
+                    <td>Financial Aid Distributed</td>
+                    <td class="number negative">-$44,797,756</td>
+                </tr>
+                <tr style="background-color: #e8f5e8;">
+                    <td><strong>Net Revenue After FA</strong></td>
+                    <td class="number"><strong>$51,388,766</strong></td>
+                </tr>
+                <tr>
+                    <td>Operating Expenses</td>
+                    <td class="number negative">-$23,489,459</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><strong>Operating Result</strong></td>
+                    <td class="number positive"><strong>+$27,899,307</strong></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Financial data
+        const financialData = {
+            "semesters": {
+                "Fall_2024_2025": {
+                    "semester": "Fall_2024_2025",
+                    "students": 26584,
+                    "students_excluding_drop": 24464,
+                    "total_paid_lusd": 11283024,
+                    "total_unpaid_lusd": 3446452,
+                    "total_paid_percent_lusd": 76.6,
+                    "total_paid_cusd": 24190708,
+                    "total_unpaid_cusd": 6489091,
+                    "total_paid_percent_cusd": 78.8,
+                    "fa_amounts": 21084813.77,
+                    "before_fa": 66494088.77,
+                    "total_expected_revenue_lusd": 14729476,
+                    "total_expected_revenue_cusd": 30679799
+                },
+                "Spring_2024_2025": {
+                    "semester": "Spring_2024_2025",
+                    "students": 23541,
+                    "students_excluding_drop": 23268,
+                    "total_paid_lusd": 9233519,
+                    "total_unpaid_lusd": 4533538,
+                    "total_paid_percent_lusd": 67.1,
+                    "total_paid_cusd": 20380759,
+                    "total_unpaid_cusd": 9460054,
+                    "total_paid_percent_cusd": 68.3,
+                    "fa_amounts": 20862054.58,
+                    "before_fa": 64469924.58,
+                    "total_expected_revenue_lusd": 13767057,
+                    "total_expected_revenue_cusd": 29840813
+                },
+                "Summer_2024_2025": {
+                    "semester": "Summer_2024_2025",
+                    "students": 9225,
+                    "students_excluding_drop": 8225,
+                    "total_paid_lusd": 487823,
+                    "total_unpaid_lusd": 1493629,
+                    "total_paid_percent_lusd": 24.6,
+                    "total_paid_cusd": 1243443,
+                    "total_unpaid_cusd": 3944482,
+                    "total_paid_percent_cusd": 24.0,
+                    "fa_amounts": 2850887.69,
+                    "before_fa": 10020264.69,
+                    "total_expected_revenue_lusd": 1981452,
+                    "total_expected_revenue_cusd": 5187925
+                }
+            },
+            "expenses": {
+                "top_categories": [
+                    ["Part-Time Salaries", 7722048.57],
+                    ["Full-Time Salaries", 6935814.14],
+                    ["VP Expenses", 844981.82],
+                    ["Income Tax", 742970],
+                    ["Insurance", 444740.11],
+                    ["Faculty Children Education", 365652.34]
+                ]
+            }
+        };
+
+        Chart.register(ChartDataLabels);
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        function formatPercent(value) {
+            return value.toFixed(1) + '%';
+        }
+
+        function getPerformanceClass(rate) {
+            if (rate >= 75) return 'good';
+            if (rate >= 50) return 'warning';
+            return 'poor';
+        }
+
+        function getPerformanceIcon(rate) {
+            if (rate >= 75) return '✓';
+            if (rate >= 50) return '!';
+            return '✗';
+        }
+
+        // Create semester sections
+        function createSemesterSections() {
+            const container = document.getElementById('semesterSections');
+            const semesters = ['Fall_2024_2025', 'Spring_2024_2025', 'Summer_2024_2025'];
+            
+            semesters.forEach(sem => {
+                const data = financialData.semesters[sem];
+                const semesterName = sem.replace(/_/g, ' ').replace('2024 2025', '2024-2025');
+                const avgRate = (data.total_paid_percent_lusd + data.total_paid_percent_cusd) / 2;
+                
+                const section = document.createElement('div');
+                section.className = 'semester-section';
+                
+                section.innerHTML = `
+                    <div class="semester-header">
+                        <h2>${semesterName} • ${data.students_excluding_drop.toLocaleString()} Students</h2>
+                        <div class="performance-badge">
+                            <div class="badge-item ${getPerformanceClass(data.total_paid_percent_lusd)}">
+                                ${getPerformanceIcon(data.total_paid_percent_lusd)} LUSD ${formatPercent(data.total_paid_percent_lusd)}
+                            </div>
+                            <div class="badge-item ${getPerformanceClass(data.total_paid_percent_cusd)}">
+                                ${getPerformanceIcon(data.total_paid_percent_cusd)} CUSD ${formatPercent(data.total_paid_percent_cusd)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="semester-metrics">
+                        <div class="metric-card lusd">
+                            <div class="metric-header">
+                                <div class="metric-title">Expected Revenue</div>
+                                <span class="currency-badge lusd">LUSD</span>
+                            </div>
+                            <div class="metric-value">${formatCurrency(data.total_expected_revenue_lusd)}</div>
+                            <div class="metric-subtitle">Collected: ${formatCurrency(data.total_paid_lusd)}</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${getPerformanceClass(data.total_paid_percent_lusd)}" 
+                                     style="width: ${data.total_paid_percent_lusd}%"></div>
+                            </div>
+                            <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; font-weight: 600; color: ${data.total_paid_percent_lusd >= 75 ? '#27ae60' : data.total_paid_percent_lusd >= 50 ? '#f39c12' : '#e74c3c'}">
+                                ${data.total_paid_percent_lusd.toFixed(1)}% Collected
+                            </div>
+                        </div>
+                        <div class="metric-card cusd">
+                            <div class="metric-header">
+                                <div class="metric-title">Expected Revenue</div>
+                                <span class="currency-badge cusd">CUSD</span>
+                            </div>
+                            <div class="metric-value">${formatCurrency(data.total_expected_revenue_cusd)}</div>
+                            <div class="metric-subtitle">Collected: ${formatCurrency(data.total_paid_cusd)}</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill ${getPerformanceClass(data.total_paid_percent_cusd)}" 
+                                     style="width: ${data.total_paid_percent_cusd}%"></div>
+                            </div>
+                            <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; font-weight: 600; color: ${data.total_paid_percent_cusd >= 75 ? '#27ae60' : data.total_paid_percent_cusd >= 50 ? '#f39c12' : '#e74c3c'}">
+                                ${data.total_paid_percent_cusd.toFixed(1)}% Collected
+                            </div>
+                        </div>
+                        <div class="metric-card lusd">
+                            <div class="metric-header">
+                                <div class="metric-title">Outstanding</div>
+                                <span class="currency-badge lusd">LUSD</span>
+                            </div>
+                            <div class="metric-value">${formatCurrency(data.total_unpaid_lusd)}</div>
+                            <div class="metric-subtitle">${(100 - data.total_paid_percent_lusd).toFixed(1)}% uncollected</div>
+                        </div>
+                        <div class="metric-card cusd">
+                            <div class="metric-header">
+                                <div class="metric-title">Outstanding</div>
+                                <span class="currency-badge cusd">CUSD</span>
+                            </div>
+                            <div class="metric-value">${formatCurrency(data.total_unpaid_cusd)}</div>
+                            <div class="metric-subtitle">${(100 - data.total_paid_percent_cusd).toFixed(1)}% uncollected</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <div class="metric-title">Financial Aid</div>
+                            </div>
+                            <div class="metric-value">${formatCurrency(data.fa_amounts)}</div>
+                            <div class="metric-subtitle">${((data.fa_amounts / (data.total_expected_revenue_lusd + data.total_expected_revenue_cusd)) * 100).toFixed(1)}% of revenue</div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(section);
+            });
+        }
+
+        // Create charts
+        function createCharts() {
+            createWaterfallChart();
+            createCollectionPerformanceChart();
+            createExpenseCategoriesChart();
+            createHeatmapChart();
+            createCurrencyMixChart();
+        }
+
+        function createWaterfallChart() {
+            const ctx = document.getElementById('waterfallChart').getContext('2d');
+            
+            const totalRevenue = 96186522;
+            const fa = 44797756;
+            const netRevenue = totalRevenue - fa;
+            const expenses = 23489459;
+            const operatingResult = netRevenue - expenses;
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Gross Revenue', 'Financial Aid', 'Net Revenue', 'Operating Expenses', 'Operating Result'],
+                    datasets: [{
+                        label: 'Amount',
+                        data: [totalRevenue, -fa, netRevenue, -expenses, operatingResult],
+                        backgroundColor: function(context) {
+                            const value = context.dataset.data[context.dataIndex];
+                            if (context.dataIndex === 0) return '#3498db';
+                            if (context.dataIndex === 2) return '#9b59b6';
+                            if (context.dataIndex === 4) return '#27ae60';
+                            return value < 0 ? '#e74c3c' : '#27ae60';
+                        },
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            formatter: function(value) {
+                                return '$' + (Math.abs(value) / 1000000).toFixed(1) + 'M';
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            color: '#2c3e50'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.parsed.y;
+                                    return (value < 0 ? '-' : '') + formatCurrency(Math.abs(value));
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (Math.abs(value)/1000000).toFixed(0) + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCollectionPerformanceChart() {
+            const ctx = document.getElementById('collectionPerformanceChart').getContext('2d');
+            const semesters = ['Fall_2024_2025', 'Spring_2024_2025', 'Summer_2024_2025'];
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: semesters.map(s => s.split('_')[0]),
+                    datasets: [{
+                        label: 'Collection Rate %',
+                        data: semesters.map(sem => {
+                            const data = financialData.semesters[sem];
+                            return ((data.total_paid_lusd + data.total_paid_cusd) / 
+                                   (data.total_expected_revenue_lusd + data.total_expected_revenue_cusd) * 100);
+                        }),
+                        backgroundColor: function(context) {
+                            const value = context.parsed.y;
+                            if (value >= 75) return '#27ae60';
+                            if (value >= 50) return '#f39c12';
+                            return '#e74c3c';
+                        },
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        datalabels: {
+                            anchor: 'center',
+                            align: 'center',
+                            formatter: function(value) {
+                                return value.toFixed(1) + '%';
+                            },
+                            color: 'white',
+                            font: {
+                                weight: 'bold',
+                                size: 14
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createExpenseCategoriesChart() {
+            const ctx = document.getElementById('expenseCategoriesChart').getContext('2d');
+            const categories = financialData.expenses.top_categories;
+            const total = categories.reduce((sum, cat) => sum + cat[1], 0);
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories.map(cat => cat[0]),
+                    datasets: [{
+                        data: categories.map(cat => cat[1]),
+                        backgroundColor: ['#e74c3c', '#f39c12', '#9b59b6', '#e67e22', '#3498db', '#1abc9c'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                },
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    return data.labels.map((label, i) => {
+                                        const value = data.datasets[0].data[i];
+                                        const percentage = (value / total * 100).toFixed(1);
+                                        return {
+                                            text: label + ' (' + percentage + '%)',
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: false,
+                                            index: i
+                                        };
+                                    });
+                                }
+                            }
+                        },
+                        datalabels: {
+                            formatter: function(value, context) {
+                                const percentage = (value / total * 100).toFixed(1);
+                                if (percentage < 5) return ''; // Hide labels for small slices
+                                return percentage + '%';
+                            },
+                            color: function(context) {
+                                // Use dark color for light backgrounds, white for dark
+                                const dataIndex = context.dataIndex;
+                                if (dataIndex === 1 || dataIndex === 4 || dataIndex === 5) {
+                                    return '#2c3e50'; // Dark color for yellow/light blue
+                                }
+                                return 'white';
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 14
+                            },
+                            anchor: 'center',
+                            align: 'center',
+                            offset: 0
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                    return context.label + ': $' + (context.parsed/1000000).toFixed(1) + 'M (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createGaugeChart() {
+            const ctx = document.getElementById('gaugeChart').getContext('2d');
+            const semesters = ['Fall_2024_2025', 'Spring_2024_2025', 'Summer_2024_2025'];
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: semesters.map(s => s.split('_')[0] + ' 2024-25'),
+                    datasets: [{
+                        label: 'LUSD Collection Rate',
+                        data: semesters.map(sem => financialData.semesters[sem].total_paid_percent_lusd),
+                        backgroundColor: '#3498db',
+                        borderColor: '#2980b9',
+                        borderWidth: 2,
+                        barPercentage: 0.7
+                    }, {
+                        label: 'CUSD Collection Rate',
+                        data: semesters.map(sem => financialData.semesters[sem].total_paid_percent_cusd),
+                        backgroundColor: '#9b59b6',
+                        borderColor: '#8e44ad',
+                        borderWidth: 2,
+                        barPercentage: 0.7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            formatter: function(value) {
+                                return value.toFixed(1) + '%';
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 14
+                            },
+                            color: function(context) {
+                                const value = context.dataset.data[context.dataIndex];
+                                if (value >= 75) return '#27ae60';
+                                if (value >= 50) return '#f39c12';
+                                return '#e74c3c';
+                            }
+                        },
+                        annotation: {
+                            annotations: {
+                                line1: {
+                                    type: 'line',
+                                    yMin: 80,
+                                    yMax: 80,
+                                    borderColor: '#27ae60',
+                                    borderWidth: 2,
+                                    borderDash: [5, 5],
+                                    label: {
+                                        content: 'Target: 80%',
+                                        enabled: true,
+                                        position: 'start',
+                                        backgroundColor: '#27ae60',
+                                        color: 'white',
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                },
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createHeatmapChart() {
+            const ctx = document.getElementById('heatmapChart').getContext('2d');
+            const semesters = ['Fall_2024_2025', 'Spring_2024_2025', 'Summer_2024_2025'];
+            
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: semesters.map(s => s.split('_')[0]),
+                    datasets: [{
+                        label: 'LUSD Outstanding',
+                        data: semesters.map(sem => financialData.semesters[sem].total_unpaid_lusd),
+                        backgroundColor: '#3498db',
+                        stack: 'outstanding'
+                    }, {
+                        label: 'CUSD Outstanding',
+                        data: semesters.map(sem => financialData.semesters[sem].total_unpaid_cusd),
+                        backgroundColor: '#9b59b6',
+                        stack: 'outstanding'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        datalabels: {
+                            display: true,
+                            formatter: function(value, context) {
+                                const semesterIndex = context.dataIndex;
+                                const datasetIndex = context.datasetIndex;
+                                const semester = semesters[semesterIndex];
+                                const data = financialData.semesters[semester];
+                                let percentage;
+                                
+                                if (datasetIndex === 0) { // LUSD
+                                    percentage = (100 - data.total_paid_percent_lusd).toFixed(1);
+                                } else { // CUSD
+                                    percentage = (100 - data.total_paid_percent_cusd).toFixed(1);
+                                }
+                                
+                                return '$' + (value / 1000000).toFixed(1) + 'M\n(' + percentage + '%)';
+                            },
+                            color: 'white',
+                            font: {
+                                weight: 'bold',
+                                size: 11
+                            },
+                            textAlign: 'center'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value/1000000).toFixed(0) + 'M';
+                                }
+                            }
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCurrencyMixChart() {
+            const ctx = document.getElementById('currencyMixChart').getContext('2d');
+            
+            const totalLUSD = 30477985;
+            const totalCUSD = 65708537;
+            const total = totalLUSD + totalCUSD;
+            
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['LUSD Revenue', 'CUSD Revenue'],
+                    datasets: [{
+                        data: [totalLUSD, totalCUSD],
+                        backgroundColor: ['#3498db', '#9b59b6'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        datalabels: {
+                            formatter: function(value, context) {
+                                const percentage = (value / total * 100).toFixed(1);
+                                return '$' + (value/1000000).toFixed(1) + 'M\n(' + percentage + '%)';
+                            },
+                            color: 'white',
+                            font: {
+                                weight: 'bold',
+                                size: 14
+                            },
+                            textAlign: 'center'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                    return context.label + ': ' + formatCurrency(context.parsed) + ' (' + percentage + '%)';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            createSemesterSections();
+            createCharts();
+        });
+    </script>
+</body>
+</html>
