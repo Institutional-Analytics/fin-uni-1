@@ -71,18 +71,26 @@
         }
 
         .semester-section {
-            margin-bottom: 40px;
+            margin-bottom: 50px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .semester-section:last-child {
+            border-bottom: none;
+            margin-bottom: 30px;
         }
 
         .semester-header {
-            background: #f8f9fa;
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 5px solid #3498db;
+            background: linear-gradient(to right, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 6px solid #3498db;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .semester-header h2 {
@@ -522,6 +530,10 @@
         </div>
 
         <!-- Semester Sections -->
+        <div style="margin: 40px 0 30px 0;">
+            <h2 style="text-align: center; color: #2c3e50; font-size: 2rem; margin-bottom: 10px;">Semester Performance Details</h2>
+            <p style="text-align: center; color: #7f8c8d; font-size: 1.1rem; margin-bottom: 30px;">Financial metrics breakdown by semester with collection performance</p>
+        </div>
         <div id="semesterSections"></div>
 
         <!-- Charts Section -->
@@ -707,17 +719,21 @@
             const container = document.getElementById('semesterSections');
             const semesters = ['Fall_2024_2025', 'Spring_2024_2025', 'Summer_2024_2025'];
             
-            semesters.forEach(sem => {
+            semesters.forEach((sem, index) => {
                 const data = financialData.semesters[sem];
                 const semesterName = sem.replace(/_/g, ' ').replace('2024 2025', '2024-2025');
                 const avgRate = (data.total_paid_percent_lusd + data.total_paid_percent_cusd) / 2;
+                
+                // Different border colors for each semester
+                const borderColors = ['#3498db', '#9b59b6', '#e67e22'];
+                const borderColor = borderColors[index];
                 
                 const section = document.createElement('div');
                 section.className = 'semester-section';
                 
                 section.innerHTML = `
-                    <div class="semester-header">
-                        <h2>${semesterName} • ${data.students_excluding_drop.toLocaleString()} Students</h2>
+                    <div class="semester-header" style="border-left-color: ${borderColor}">
+                        <h2>${semesterName} • ${data.students.toLocaleString()} Students (${data.students_excluding_drop.toLocaleString()} Excluding Drop All)</h2>
                         <div class="performance-badge">
                             <div class="badge-item ${getPerformanceClass(data.total_paid_percent_lusd)}">
                                 ${getPerformanceIcon(data.total_paid_percent_lusd)} LUSD ${formatPercent(data.total_paid_percent_lusd)}
