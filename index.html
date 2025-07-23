@@ -131,10 +131,14 @@
         }
 
         .semester-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 15px;
             margin-bottom: 30px;
+        }
+        
+        .currency-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
         }
 
         .metric-card {
@@ -449,7 +453,7 @@
                 grid-template-columns: 1fr;
             }
             
-            .semester-metrics {
+            .currency-row {
                 grid-template-columns: 1fr;
             }
             
@@ -480,7 +484,7 @@
                     <div class="kpi-icon revenue">💰</div>
                 </div>
                 <div class="kpi-value">$96.19M</div>
-                <div class="kpi-change">LUSD: $30.48M | CUSD: $65.71M</div>
+                <div class="kpi-change">CUSD: $65.71M | LUSD: $30.48M</div>
             </div>
 
             <div class="kpi-card fa">
@@ -598,12 +602,12 @@
                     <td class="number"><strong>$96,186,522</strong></td>
                 </tr>
                 <tr>
-                    <td>&nbsp;&nbsp;&nbsp;&nbsp;LUSD Component</td>
-                    <td class="number">$30,477,985</td>
-                </tr>
-                <tr>
                     <td>&nbsp;&nbsp;&nbsp;&nbsp;CUSD Component</td>
                     <td class="number">$65,708,537</td>
+                </tr>
+                <tr>
+                    <td>&nbsp;&nbsp;&nbsp;&nbsp;LUSD Component</td>
+                    <td class="number">$30,477,985</td>
                 </tr>
                 <tr>
                     <td>Financial Aid Distributed</td>
@@ -735,67 +739,74 @@
                     <div class="semester-header" style="border-left-color: ${borderColor}">
                         <h2>${semesterName} • ${data.students.toLocaleString()} Students (${data.students_excluding_drop.toLocaleString()} Excluding Drop All)</h2>
                         <div class="performance-badge">
-                            <div class="badge-item ${getPerformanceClass(data.total_paid_percent_lusd)}">
-                                ${getPerformanceIcon(data.total_paid_percent_lusd)} LUSD ${formatPercent(data.total_paid_percent_lusd)}
-                            </div>
                             <div class="badge-item ${getPerformanceClass(data.total_paid_percent_cusd)}">
                                 ${getPerformanceIcon(data.total_paid_percent_cusd)} CUSD ${formatPercent(data.total_paid_percent_cusd)}
+                            </div>
+                            <div class="badge-item ${getPerformanceClass(data.total_paid_percent_lusd)}">
+                                ${getPerformanceIcon(data.total_paid_percent_lusd)} LUSD ${formatPercent(data.total_paid_percent_lusd)}
                             </div>
                         </div>
                     </div>
                     <div class="semester-metrics">
-                        <div class="metric-card lusd">
-                            <div class="metric-header">
-                                <div class="metric-title">Expected Revenue</div>
-                                <span class="currency-badge lusd">LUSD</span>
+                        <!-- CUSD Row -->
+                        <div class="currency-row">
+                            <div class="metric-card cusd">
+                                <div class="metric-header">
+                                    <div class="metric-title">Expected Revenue</div>
+                                    <span class="currency-badge cusd">CUSD</span>
+                                </div>
+                                <div class="metric-value">${formatCurrency(data.total_expected_revenue_cusd)}</div>
+                                <div class="metric-subtitle">Collected: ${formatCurrency(data.total_paid_cusd)}</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill ${getPerformanceClass(data.total_paid_percent_cusd)}" 
+                                         style="width: ${data.total_paid_percent_cusd}%"></div>
+                                </div>
+                                <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; font-weight: 600; color: ${data.total_paid_percent_cusd >= 75 ? '#27ae60' : data.total_paid_percent_cusd >= 50 ? '#f39c12' : '#e74c3c'}">
+                                    ${data.total_paid_percent_cusd.toFixed(1)}% Collected
+                                </div>
                             </div>
-                            <div class="metric-value">${formatCurrency(data.total_expected_revenue_lusd)}</div>
-                            <div class="metric-subtitle">Collected: ${formatCurrency(data.total_paid_lusd)}</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill ${getPerformanceClass(data.total_paid_percent_lusd)}" 
-                                     style="width: ${data.total_paid_percent_lusd}%"></div>
+                            <div class="metric-card cusd">
+                                <div class="metric-header">
+                                    <div class="metric-title">Outstanding</div>
+                                    <span class="currency-badge cusd">CUSD</span>
+                                </div>
+                                <div class="metric-value">${formatCurrency(data.total_unpaid_cusd)}</div>
+                                <div class="metric-subtitle">${(100 - data.total_paid_percent_cusd).toFixed(1)}% uncollected</div>
                             </div>
-                            <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; font-weight: 600; color: ${data.total_paid_percent_lusd >= 75 ? '#27ae60' : data.total_paid_percent_lusd >= 50 ? '#f39c12' : '#e74c3c'}">
-                                ${data.total_paid_percent_lusd.toFixed(1)}% Collected
+                            <div class="metric-card">
+                                <div class="metric-header">
+                                    <div class="metric-title">Financial Aid</div>
+                                </div>
+                                <div class="metric-value">${formatCurrency(data.fa_amounts)}</div>
+                                <div class="metric-subtitle">${((data.fa_amounts / (data.total_expected_revenue_lusd + data.total_expected_revenue_cusd)) * 100).toFixed(1)}% of revenue</div>
                             </div>
                         </div>
-                        <div class="metric-card cusd">
-                            <div class="metric-header">
-                                <div class="metric-title">Expected Revenue</div>
-                                <span class="currency-badge cusd">CUSD</span>
+                        <!-- LUSD Row -->
+                        <div class="currency-row">
+                            <div class="metric-card lusd">
+                                <div class="metric-header">
+                                    <div class="metric-title">Expected Revenue</div>
+                                    <span class="currency-badge lusd">LUSD</span>
+                                </div>
+                                <div class="metric-value">${formatCurrency(data.total_expected_revenue_lusd)}</div>
+                                <div class="metric-subtitle">Collected: ${formatCurrency(data.total_paid_lusd)}</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill ${getPerformanceClass(data.total_paid_percent_lusd)}" 
+                                         style="width: ${data.total_paid_percent_lusd}%"></div>
+                                </div>
+                                <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; font-weight: 600; color: ${data.total_paid_percent_lusd >= 75 ? '#27ae60' : data.total_paid_percent_lusd >= 50 ? '#f39c12' : '#e74c3c'}">
+                                    ${data.total_paid_percent_lusd.toFixed(1)}% Collected
+                                </div>
                             </div>
-                            <div class="metric-value">${formatCurrency(data.total_expected_revenue_cusd)}</div>
-                            <div class="metric-subtitle">Collected: ${formatCurrency(data.total_paid_cusd)}</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill ${getPerformanceClass(data.total_paid_percent_cusd)}" 
-                                     style="width: ${data.total_paid_percent_cusd}%"></div>
+                            <div class="metric-card lusd">
+                                <div class="metric-header">
+                                    <div class="metric-title">Outstanding</div>
+                                    <span class="currency-badge lusd">LUSD</span>
+                                </div>
+                                <div class="metric-value">${formatCurrency(data.total_unpaid_lusd)}</div>
+                                <div class="metric-subtitle">${(100 - data.total_paid_percent_lusd).toFixed(1)}% uncollected</div>
                             </div>
-                            <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; font-weight: 600; color: ${data.total_paid_percent_cusd >= 75 ? '#27ae60' : data.total_paid_percent_cusd >= 50 ? '#f39c12' : '#e74c3c'}">
-                                ${data.total_paid_percent_cusd.toFixed(1)}% Collected
-                            </div>
-                        </div>
-                        <div class="metric-card lusd">
-                            <div class="metric-header">
-                                <div class="metric-title">Outstanding</div>
-                                <span class="currency-badge lusd">LUSD</span>
-                            </div>
-                            <div class="metric-value">${formatCurrency(data.total_unpaid_lusd)}</div>
-                            <div class="metric-subtitle">${(100 - data.total_paid_percent_lusd).toFixed(1)}% uncollected</div>
-                        </div>
-                        <div class="metric-card cusd">
-                            <div class="metric-header">
-                                <div class="metric-title">Outstanding</div>
-                                <span class="currency-badge cusd">CUSD</span>
-                            </div>
-                            <div class="metric-value">${formatCurrency(data.total_unpaid_cusd)}</div>
-                            <div class="metric-subtitle">${(100 - data.total_paid_percent_cusd).toFixed(1)}% uncollected</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-header">
-                                <div class="metric-title">Financial Aid</div>
-                            </div>
-                            <div class="metric-value">${formatCurrency(data.fa_amounts)}</div>
-                            <div class="metric-subtitle">${((data.fa_amounts / (data.total_expected_revenue_lusd + data.total_expected_revenue_cusd)) * 100).toFixed(1)}% of revenue</div>
+                            <div style="grid-column: 3;"></div> <!-- Empty cell to maintain alignment -->
                         </div>
                     </div>
                 `;
