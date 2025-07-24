@@ -216,6 +216,15 @@
             color: #7f8c8d;
         }
 
+        .metric-conversion {
+            font-size: 0.9rem;
+            color: #2980b9;
+            font-weight: 600;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #e3f2fd;
+        }
+
         .progress-bar {
             width: 100%;
             height: 6px;
@@ -472,19 +481,25 @@
 
         <!-- Financial Alert -->
         <div class="alert-banner">
-            <h3>✅ Strong Operating Result</h3>
-            <p>Operating surplus of $27.90M. Net revenue after FA ($51.39M) exceeds expenses ($23.49M).</p>
+            <h3>✅ Strong Financial Performance</h3>
+            <p>Cash surplus of $30.53M (collections $54.02M - expenses $23.49M) • Expected surplus of $54.13M if all receivables collected</p>
+        </div>
+
+        <!-- Currency Conversion Note -->
+        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 15px; margin-bottom: 30px; text-align: center;">
+            <h4 style="color: #856404; margin-bottom: 5px; font-size: 1.1rem;">📊 Currency Conversion Note</h4>
+            <p style="color: #856404; margin: 0; font-weight: 500;">LUSD amounts are displayed in original currency with USD conversion shown below<br>Conversion rate: LUSD × 35,000 ÷ 89,700 = USD</p>
         </div>
 
         <!-- Overall KPIs -->
         <div class="kpi-section">
             <div class="kpi-card revenue">
                 <div class="kpi-header">
-                    <div class="kpi-title">Total Expected Revenue</div>
-                    <div class="kpi-icon revenue">💰</div>
+                    <div class="kpi-title">Total Gross Amount (Before FA)</div>
+                    <div class="kpi-icon revenue">📈</div>
                 </div>
-                <div class="kpi-value">$96.19M</div>
-                <div class="kpi-change">CUSD: $65.71M | LUSD: $30.48M</div>
+                <div class="kpi-value">$140.98M</div>
+                <div class="kpi-change">Total amount before financial aid deductions</div>
             </div>
 
             <div class="kpi-card fa">
@@ -493,16 +508,26 @@
                     <div class="kpi-icon fa">🎓</div>
                 </div>
                 <div class="kpi-value">$44.80M</div>
-                <div class="kpi-change">46.6% of revenue</div>
+                <div class="kpi-change">31.8% of gross amount</div>
             </div>
+
+            <div class="kpi-card revenue">
+                <div class="kpi-header">
+                    <div class="kpi-title">Net Revenue (After FA)</div>
+                    <div class="kpi-icon revenue">💰</div>
+                </div>
+                <div class="kpi-value">$77.62M</div>
+                <div class="kpi-change">CUSD: $65.71M | LUSD: 30,477,985 (≈$11.91M)</div>
+            </div>
+
 
             <div class="kpi-card collections">
                 <div class="kpi-header">
                     <div class="kpi-title">Total Collections</div>
                     <div class="kpi-icon collections">💵</div>
                 </div>
-                <div class="kpi-value">$66.82M</div>
-                <div class="kpi-change">69.5% collection rate</div>
+                <div class="kpi-value">$54.02M</div>
+                <div class="kpi-change">CUSD: $45.81M | LUSD: 21,004,366 (≈$8.21M)</div>
             </div>
 
             <div class="kpi-card outstanding">
@@ -510,8 +535,8 @@
                     <div class="kpi-title">Total Outstanding</div>
                     <div class="kpi-icon outstanding">📊</div>
                 </div>
-                <div class="kpi-value">$29.37M</div>
-                <div class="kpi-change">30.5% uncollected</div>
+                <div class="kpi-value">$23.59M</div>
+                <div class="kpi-change">CUSD: $19.89M | LUSD: 9,473,619 (≈$3.70M)</div>
             </div>
 
             <div class="kpi-card expenses">
@@ -525,11 +550,20 @@
 
             <div class="kpi-card result">
                 <div class="kpi-header">
-                    <div class="kpi-title">Operating Result</div>
-                    <div class="kpi-icon result">✅</div>
+                    <div class="kpi-title">Cash Operating Result</div>
+                    <div class="kpi-icon result">💵</div>
                 </div>
-                <div class="kpi-value positive">+$27.90M</div>
-                <div class="kpi-change">Surplus after expenses</div>
+                <div class="kpi-value positive">+$30.53M</div>
+                <div class="kpi-change">Actual surplus (based on collections)</div>
+            </div>
+
+            <div class="kpi-card result">
+                <div class="kpi-header">
+                    <div class="kpi-title">Expected Operating Result</div>
+                    <div class="kpi-icon result">📈</div>
+                </div>
+                <div class="kpi-value positive">+$54.13M</div>
+                <div class="kpi-change">Expected surplus (if all collected)</div>
             </div>
         </div>
 
@@ -598,8 +632,16 @@
             <h3 class="chart-title">Financial Summary</h3>
             <table class="data-table">
                 <tr>
-                    <td><strong>Total Expected Revenue</strong></td>
-                    <td class="number"><strong>$96,186,522</strong></td>
+                    <td><strong>Total Gross Amount (Before FA)</strong></td>
+                    <td class="number"><strong>$140,984,278</strong></td>
+                </tr>
+                <tr>
+                    <td>Financial Aid Distributed</td>
+                    <td class="number negative">-$44,797,756</td>
+                </tr>
+                <tr style="background-color: #e8f5e8;">
+                    <td><strong>Net Revenue (After FA)</strong></td>
+                    <td class="number"><strong>$77,619,125</strong></td>
                 </tr>
                 <tr>
                     <td>&nbsp;&nbsp;&nbsp;&nbsp;CUSD Component</td>
@@ -607,23 +649,30 @@
                 </tr>
                 <tr>
                     <td>&nbsp;&nbsp;&nbsp;&nbsp;LUSD Component</td>
-                    <td class="number">$30,477,985</td>
-                </tr>
-                <tr>
-                    <td>Financial Aid Distributed</td>
-                    <td class="number negative">-$44,797,756</td>
-                </tr>
-                <tr style="background-color: #e8f5e8;">
-                    <td><strong>Net Revenue After FA</strong></td>
-                    <td class="number"><strong>$51,388,766</strong></td>
+                    <td class="number">LUSD: 30,477,985 (≈$11,910,588)</td>
                 </tr>
                 <tr>
                     <td>Operating Expenses</td>
                     <td class="number negative">-$23,489,459</td>
                 </tr>
                 <tr style="background-color: #d4edda;">
-                    <td><strong>Operating Result</strong></td>
-                    <td class="number positive"><strong>+$27,899,307</strong></td>
+                    <td><strong>Expected Operating Result</strong></td>
+                    <td class="number positive"><strong>+$54,129,666</strong></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="padding-top: 20px;"><strong>Cash Position Analysis</strong></td>
+                </tr>
+                <tr>
+                    <td>Total Collections to Date</td>
+                    <td class="number">$54,025,856</td>
+                </tr>
+                <tr>
+                    <td>Operating Expenses</td>
+                    <td class="number negative">-$23,489,459</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><strong>Cash Operating Result</strong></td>
+                    <td class="number positive"><strong>+$30,536,397</strong></td>
                 </tr>
             </table>
         </div>
@@ -702,6 +751,17 @@
             }).format(value);
         }
 
+        function formatLUSD(value) {
+            return new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        function convertLUSDtoUSD(lusdValue) {
+            return (lusdValue * 35000) / 89700;
+        }
+
         function formatPercent(value) {
             return value.toFixed(1) + '%';
         }
@@ -775,10 +835,10 @@
                             </div>
                             <div class="metric-card">
                                 <div class="metric-header">
-                                    <div class="metric-title">Financial Aid</div>
+                                    <div class="metric-title">Gross Amount (Before FA)</div>
                                 </div>
-                                <div class="metric-value">${formatCurrency(data.fa_amounts)}</div>
-                                <div class="metric-subtitle">${((data.fa_amounts / (data.total_expected_revenue_lusd + data.total_expected_revenue_cusd)) * 100).toFixed(1)}% of revenue</div>
+                                <div class="metric-value">${formatCurrency(data.before_fa)}</div>
+                                <div class="metric-subtitle">FA: ${formatCurrency(data.fa_amounts)} (${((data.fa_amounts / data.before_fa) * 100).toFixed(1)}%)</div>
                             </div>
                         </div>
                         <!-- LUSD Row -->
@@ -788,8 +848,9 @@
                                     <div class="metric-title">Expected Revenue</div>
                                     <span class="currency-badge lusd">LUSD</span>
                                 </div>
-                                <div class="metric-value">${formatCurrency(data.total_expected_revenue_lusd)}</div>
-                                <div class="metric-subtitle">Collected: ${formatCurrency(data.total_paid_lusd)}</div>
+                                <div class="metric-value">${formatLUSD(data.total_expected_revenue_lusd)}</div>
+                                <div class="metric-subtitle">Collected: ${formatLUSD(data.total_paid_lusd)}</div>
+                                <div class="metric-conversion">≈ ${formatCurrency(convertLUSDtoUSD(data.total_expected_revenue_lusd))}</div>
                                 <div class="progress-bar">
                                     <div class="progress-fill ${getPerformanceClass(data.total_paid_percent_lusd)}" 
                                          style="width: ${data.total_paid_percent_lusd}%"></div>
@@ -803,8 +864,9 @@
                                     <div class="metric-title">Outstanding</div>
                                     <span class="currency-badge lusd">LUSD</span>
                                 </div>
-                                <div class="metric-value">${formatCurrency(data.total_unpaid_lusd)}</div>
+                                <div class="metric-value">${formatLUSD(data.total_unpaid_lusd)}</div>
                                 <div class="metric-subtitle">${(100 - data.total_paid_percent_lusd).toFixed(1)}% uncollected</div>
+                                <div class="metric-conversion">≈ ${formatCurrency(convertLUSDtoUSD(data.total_unpaid_lusd))}</div>
                             </div>
                             <div style="grid-column: 3;"></div> <!-- Empty cell to maintain alignment -->
                         </div>
@@ -827,11 +889,11 @@
         function createWaterfallChart() {
             const ctx = document.getElementById('waterfallChart').getContext('2d');
             
-            const totalRevenue = 96186522;
+            const grossRevenue = 140984278;  // Total Before FA from data files
             const fa = 44797756;
-            const netRevenue = totalRevenue - fa;
+            const netRevenue = 77619125;  // Total expected revenue with LUSD converted to USD
             const expenses = 23489459;
-            const operatingResult = netRevenue - expenses;
+            const operatingResult = netRevenue - expenses;  // 54,129,666
             
             new Chart(ctx, {
                 type: 'bar',
@@ -839,7 +901,7 @@
                     labels: ['Gross Revenue', 'Financial Aid', 'Net Revenue', 'Operating Expenses', 'Operating Result'],
                     datasets: [{
                         label: 'Amount',
-                        data: [totalRevenue, -fa, netRevenue, -expenses, operatingResult],
+                        data: [grossRevenue, -fa, netRevenue, -expenses, operatingResult],
                         backgroundColor: function(context) {
                             const value = context.dataset.data[context.dataIndex];
                             if (context.dataIndex === 0) return '#3498db';
@@ -853,13 +915,22 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            top: 30,
+                            bottom: 10
+                        }
+                    },
                     plugins: {
                         legend: {
                             display: false
                         },
                         datalabels: {
                             anchor: 'end',
-                            align: 'top',
+                            align: function(context) {
+                                // Use 'bottom' alignment for the first bar to prevent cutoff
+                                return context.dataIndex === 0 ? 'bottom' : 'top';
+                            },
                             formatter: function(value) {
                                 return '$' + (Math.abs(value) / 1000000).toFixed(1) + 'M';
                             },
@@ -867,7 +938,8 @@
                                 weight: 'bold',
                                 size: 12
                             },
-                            color: '#2c3e50'
+                            color: '#2c3e50',
+                            offset: 5
                         },
                         tooltip: {
                             callbacks: {
@@ -1147,8 +1219,8 @@
                 data: {
                     labels: semesters.map(s => s.split('_')[0]),
                     datasets: [{
-                        label: 'LUSD Outstanding',
-                        data: semesters.map(sem => financialData.semesters[sem].total_unpaid_lusd),
+                        label: 'LUSD Outstanding (USD)',
+                        data: semesters.map(sem => convertLUSDtoUSD(financialData.semesters[sem].total_unpaid_lusd)),
                         backgroundColor: '#3498db',
                         stack: 'outstanding'
                     }, {
@@ -1171,14 +1243,17 @@
                                 const semester = semesters[semesterIndex];
                                 const data = financialData.semesters[semester];
                                 let percentage;
+                                let displayValue;
                                 
                                 if (datasetIndex === 0) { // LUSD
                                     percentage = (100 - data.total_paid_percent_lusd).toFixed(1);
+                                    displayValue = '$' + (value / 1000000).toFixed(1) + 'M USD';
                                 } else { // CUSD
                                     percentage = (100 - data.total_paid_percent_cusd).toFixed(1);
+                                    displayValue = '$' + (value / 1000000).toFixed(1) + 'M';
                                 }
                                 
-                                return '$' + (value / 1000000).toFixed(1) + 'M\n(' + percentage + '%)';
+                                return displayValue + '\n(' + percentage + '%)';
                             },
                             color: 'white',
                             font: {
@@ -1208,16 +1283,17 @@
         function createCurrencyMixChart() {
             const ctx = document.getElementById('currencyMixChart').getContext('2d');
             
-            const totalLUSD = 30477985;
+            const totalLUSD = 30477985;  // Total LUSD revenue (unconverted)
+            const totalLUSDinUSD = convertLUSDtoUSD(totalLUSD);  // Convert to USD
             const totalCUSD = 65708537;
-            const total = totalLUSD + totalCUSD;
+            const total = totalLUSDinUSD + totalCUSD;  // Total in USD
             
             new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ['LUSD Revenue', 'CUSD Revenue'],
+                    labels: ['LUSD Revenue (USD)', 'CUSD Revenue'],
                     datasets: [{
-                        data: [totalLUSD, totalCUSD],
+                        data: [totalLUSDinUSD, totalCUSD],
                         backgroundColor: ['#3498db', '#9b59b6'],
                         borderWidth: 2,
                         borderColor: '#fff'
