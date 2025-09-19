@@ -482,7 +482,7 @@
         <!-- Financial Alert -->
         <div class="alert-banner">
             <h3>✅ Strong Financial Performance</h3>
-            <p>Cash surplus of $39.23M (collections $62.72M - expenses $23.49M) • Expected surplus of $53.93M if all receivables collected</p>
+            <p>Cash surplus of $39.23M (collections $62.72M - expenses $23.49M) • Expected surplus of $53.93M if all receivables collected • Total Reserves: $37.52M</p>
         </div>
 
         <!-- Currency Conversion Note -->
@@ -565,6 +565,62 @@
                 <div class="kpi-value positive">+$53.93M</div>
                 <div class="kpi-change">Expected surplus (if all collected)</div>
             </div>
+
+            <div class="kpi-card" style="border-color: #2ecc71;">
+                <div class="kpi-header">
+                    <div class="kpi-title">Total Cash Reserves</div>
+                    <div class="kpi-icon" style="background: #2ecc71;">💎</div>
+                </div>
+                <div class="kpi-value" style="color: #2ecc71;">$37.52M</div>
+                <div class="kpi-change">Total reserves</div>
+            </div>
+        </div>
+
+        <!-- Reserves Section -->
+        <div style="margin: 40px 0 30px 0;">
+            <h2 style="text-align: center; color: #2c3e50; font-size: 2rem; margin-bottom: 10px;">Cash Reserves by Semester</h2>
+            <p style="text-align: center; color: #7f8c8d; font-size: 1.1rem; margin-bottom: 30px;">Available cash reserves breakdown by academic semester</p>
+        </div>
+
+        <div class="kpi-section" style="margin-bottom: 50px;">
+            <div class="kpi-card" style="border-color: #3498db;">
+                <div class="kpi-header">
+                    <div class="kpi-title">Fall Reserves</div>
+                    <div class="kpi-icon" style="background: #3498db;">🍂</div>
+                </div>
+                <div class="kpi-value" style="color: #3498db;">$14.47M</div>
+                <div class="kpi-change">October - January</div>
+                <div class="progress-bar" style="margin-top: 15px;">
+                    <div class="progress-fill" style="width: 38.6%; background: #3498db;"></div>
+                </div>
+                <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; color: #7f8c8d;">38.6% of total reserves</div>
+            </div>
+
+            <div class="kpi-card" style="border-color: #9b59b6;">
+                <div class="kpi-header">
+                    <div class="kpi-title">Spring Reserves</div>
+                    <div class="kpi-icon" style="background: #9b59b6;">🌸</div>
+                </div>
+                <div class="kpi-value" style="color: #9b59b6;">$17.73M</div>
+                <div class="kpi-change">February - June</div>
+                <div class="progress-bar" style="margin-top: 15px;">
+                    <div class="progress-fill" style="width: 47.2%; background: #9b59b6;"></div>
+                </div>
+                <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; color: #7f8c8d;">47.2% of total reserves</div>
+            </div>
+
+            <div class="kpi-card" style="border-color: #e67e22;">
+                <div class="kpi-header">
+                    <div class="kpi-title">Summer Reserves</div>
+                    <div class="kpi-icon" style="background: #e67e22;">☀️</div>
+                </div>
+                <div class="kpi-value" style="color: #e67e22;">$5.32M</div>
+                <div class="kpi-change">July - September</div>
+                <div class="progress-bar" style="margin-top: 15px;">
+                    <div class="progress-fill" style="width: 14.2%; background: #e67e22;"></div>
+                </div>
+                <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; color: #7f8c8d;">14.2% of total reserves</div>
+            </div>
         </div>
 
         <!-- Semester Sections -->
@@ -625,6 +681,13 @@
                     <canvas id="currencyMixChart"></canvas>
                 </div>
             </div>
+
+            <div class="chart-card full-width">
+                <h3 class="chart-title">Monthly Cash Reserves Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="monthlyReservesChart"></canvas>
+                </div>
+            </div>
         </div>
 
         <!-- Summary Table -->
@@ -674,6 +737,25 @@
                     <td><strong>Cash Operating Result</strong></td>
                     <td class="number positive"><strong>+$39,232,920</strong></td>
                 </tr>
+                <tr>
+                    <td colspan="2" style="padding-top: 20px;"><strong>Cash Reserves Analysis</strong></td>
+                </tr>
+                <tr>
+                    <td>Fall Semester Reserves (Oct-Jan)</td>
+                    <td class="number">$14,470,646</td>
+                </tr>
+                <tr>
+                    <td>Spring Semester Reserves (Feb-Jun)</td>
+                    <td class="number">$17,729,073</td>
+                </tr>
+                <tr>
+                    <td>Summer Semester Reserves (Jul-Sep)</td>
+                    <td class="number">$5,320,759</td>
+                </tr>
+                <tr style="background-color: #e8f5e8;">
+                    <td><strong>Total Cash Reserves</strong></td>
+                    <td class="number"><strong>$37,520,477</strong></td>
+                </tr>
             </table>
         </div>
     </div>
@@ -681,6 +763,28 @@
     <script>
         // Financial data
         const financialData = {
+            "reserves": {
+                "monthly": [
+                    {"month": "October", "amount": 1545338.52, "semester": "Fall"},
+                    {"month": "November", "amount": 1460873.72, "semester": "Fall"},
+                    {"month": "December", "amount": 3774687.91, "semester": "Fall"},
+                    {"month": "January", "amount": 7689745.59, "semester": "Fall"},
+                    {"month": "February", "amount": 4467591.43, "semester": "Spring"},
+                    {"month": "March", "amount": 3016262.56, "semester": "Spring"},
+                    {"month": "April", "amount": 2651571.41, "semester": "Spring"},
+                    {"month": "May", "amount": 4609937.71, "semester": "Spring"},
+                    {"month": "June", "amount": 2983709.51, "semester": "Spring"},
+                    {"month": "July", "amount": 887359.18, "semester": "Summer"},
+                    {"month": "August", "amount": 561318.84, "semester": "Summer"},
+                    {"month": "September", "amount": 3872080.86, "semester": "Summer"}
+                ],
+                "by_semester": {
+                    "Fall": 14470645.75,
+                    "Spring": 17729072.62,
+                    "Summer": 5320758.88
+                },
+                "total": 37520477.25
+            },
             "semesters": {
                 "Fall_2024_2025": {
                     "semester": "Fall_2024_2025",
@@ -884,6 +988,7 @@
             createExpenseCategoriesChart();
             createHeatmapChart();
             createCurrencyMixChart();
+            createMonthlyReservesChart();
         }
 
         function createWaterfallChart() {
@@ -1330,6 +1435,77 @@
                                     const percentage = ((context.parsed * 100) / total).toFixed(1);
                                     return context.label + ': ' + formatCurrency(context.parsed) + ' (' + percentage + '%)';
                                 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createMonthlyReservesChart() {
+            const ctx = document.getElementById('monthlyReservesChart').getContext('2d');
+            const monthlyData = financialData.reserves.monthly;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: monthlyData.map(d => d.month),
+                    datasets: [{
+                        label: 'Cash Reserves',
+                        data: monthlyData.map(d => d.amount),
+                        backgroundColor: monthlyData.map(d => {
+                            if (d.semester === 'Fall') return '#3498db';
+                            if (d.semester === 'Spring') return '#9b59b6';
+                            return '#e67e22';
+                        }),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            formatter: function(value) {
+                                return '$' + (value / 1000000).toFixed(1) + 'M';
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 10
+                            },
+                            color: '#2c3e50'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const dataIndex = context.dataIndex;
+                                    const semester = monthlyData[dataIndex].semester;
+                                    const percentage = (monthlyData[dataIndex].amount / financialData.reserves.total * 100).toFixed(1);
+                                    return 'Semester: ' + semester + '\n' + percentage + '% of total reserves';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value/1000000).toFixed(0) + 'M';
+                                }
+                            },
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
                             }
                         }
                     }
