@@ -481,6 +481,11 @@
             color: #c0392b;
         }
 
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
+        }
+
         @media (max-width: 768px) {
             .charts-section {
                 grid-template-columns: 1fr;
@@ -511,13 +516,27 @@
             <p class="subtitle">Comprehensive Financial Performance Analysis • All Academic Years</p>
         </div>
 
-        <!-- Year Selector -->
-        <div class="year-selector">
-            <div class="year-selector-title">📊 Select Academic Year</div>
-            <div class="year-buttons" id="yearButtons">
-                <!-- Year buttons will be populated here -->
+        <!-- View Selector -->
+        <div style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(44, 62, 80, 0.3);">
+            <div style="display: flex; justify-content: center; gap: 20px;">
+                <button id="dashboardViewBtn" class="view-btn active" onclick="switchView('dashboard')" style="background: white; border: 2px solid white; border-radius: 10px; padding: 12px 30px; font-size: 1rem; font-weight: 600; color: #2c3e50; cursor: pointer; transition: all 0.3s ease; min-width: 150px;">
+                    📊 Dashboard
+                </button>
+                <button id="graphsViewBtn" class="view-btn" onclick="switchView('graphs')" style="background: transparent; border: 2px solid white; border-radius: 10px; padding: 12px 30px; font-size: 1rem; font-weight: 600; color: white; cursor: pointer; transition: all 0.3s ease; min-width: 150px;">
+                    📈 Trend Analysis
+                </button>
             </div>
         </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboardView">
+            <!-- Year Selector -->
+            <div class="year-selector">
+                <div class="year-selector-title">📊 Select Academic Year</div>
+                <div class="year-buttons" id="yearButtons">
+                    <!-- Year buttons will be populated here -->
+                </div>
+            </div>
 
         <!-- Main Content Container -->
         <div id="mainContent" style="display: none;">
@@ -569,6 +588,18 @@
                 </table>
             </div>
         </div>
+        </div><!-- End Dashboard View -->
+
+        <!-- Graphs View -->
+        <div id="graphsView" style="display: none;">
+            <div style="margin: 40px 0 30px 0;">
+                <h2 style="text-align: center; color: #2c3e50; font-size: 2.5rem; margin-bottom: 10px;">📈 Historical Trend Analysis</h2>
+                <p style="text-align: center; color: #7f8c8d; font-size: 1.3rem; margin-bottom: 30px;">Financial metrics and student enrollment trends across all academic years</p>
+            </div>
+            <div id="graphsSection" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
+                <!-- Line charts will be populated here -->
+            </div>
+        </div><!-- End Graphs View -->
     </div>
 
     <script>
@@ -1299,10 +1330,55 @@
 
         // Global variables
         let currentYear = null;
+        let currentView = 'dashboard';
         let charts = {};
+        let trendsInitialized = false;
 
         // Initialize Chart.js with data labels plugin
         Chart.register(ChartDataLabels);
+
+        // Switch between Dashboard and Graphs views
+        function switchView(view) {
+            currentView = view;
+
+            // Update button styles
+            const dashboardBtn = document.getElementById('dashboardViewBtn');
+            const graphsBtn = document.getElementById('graphsViewBtn');
+
+            if (view === 'dashboard') {
+                // Show dashboard
+                document.getElementById('dashboardView').style.display = 'block';
+                document.getElementById('graphsView').style.display = 'none';
+
+                // Update button styles
+                dashboardBtn.style.background = 'white';
+                dashboardBtn.style.color = '#2c3e50';
+                dashboardBtn.style.borderColor = 'white';
+
+                graphsBtn.style.background = 'transparent';
+                graphsBtn.style.color = 'white';
+                graphsBtn.style.borderColor = 'white';
+            } else {
+                // Show graphs
+                document.getElementById('dashboardView').style.display = 'none';
+                document.getElementById('graphsView').style.display = 'block';
+
+                // Update button styles
+                graphsBtn.style.background = 'white';
+                graphsBtn.style.color = '#2c3e50';
+                graphsBtn.style.borderColor = 'white';
+
+                dashboardBtn.style.background = 'transparent';
+                dashboardBtn.style.color = 'white';
+                dashboardBtn.style.borderColor = 'white';
+
+                // Initialize trends if not already done
+                if (!trendsInitialized) {
+                    updateTrendGraphs();
+                    trendsInitialized = true;
+                }
+            }
+        }
 
         // Utility functions
         function formatCurrency(value) {
@@ -1489,11 +1565,39 @@
                 });
             }
 
-            // Net Revenue - always available as it's calculated from actual data
+            // Net Revenue - this is the USD equivalent value after converting LUSD to USD
+            // For years before 2024, LUSD had much lower value, so net revenue < gross_after_fa
+            let revenueChangeText;
+
+            // Calculate CUSD and LUSD totals from semesters for display
+            let cusdTotal = 0;
+            let lusdTotal = 0;
+            Object.values(data.semesters).forEach(sem => {
+                cusdTotal += sem.total_expected_revenue_cusd || 0;
+                lusdTotal += sem.total_expected_revenue_lusd || 0;
+            });
+
+            if (shouldConvertLUSD(data.year)) {
+                // For 2024-2025 and 2025-2026, we can show the breakdown since we know the conversion
+                if (lusdTotal > 0) {
+                    const convertedLUSD = convertLUSDtoUSD(lusdTotal, data.year);
+                    revenueChangeText = `CUSD: ${formatCurrency(cusdTotal)} + LUSD: ${formatLUSD(lusdTotal)} (→ ${formatCurrency(convertedLUSD)} USD)`;
+                } else {
+                    revenueChangeText = `CUSD: ${formatCurrency(cusdTotal)}`;
+                }
+            } else {
+                // For other years, show both the nominal and USD equivalent
+                if (data.totals.gross_after_fa) {
+                    revenueChangeText = `USD value of ${formatCurrency(data.totals.gross_after_fa)} (CUSD + LUSD nominal)`;
+                } else {
+                    revenueChangeText = `Total expected revenue in USD equivalent`;
+                }
+            }
+
             kpis.push({
-                title: 'Net Revenue',
+                title: 'Net Revenue (USD Equivalent)',
                 value: data.totals.net_revenue,
-                change: 'Total expected revenue (CUSD + LUSD converted)',
+                change: revenueChangeText,
                 class: 'revenue',
                 icon: '💰'
             });
@@ -1898,6 +2002,247 @@
                             },
                             color: 'white',
                             font: { weight: 'bold', size: 12 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update trend graphs showing metrics over all years
+        function updateTrendGraphs() {
+            const graphsSection = document.getElementById('graphsSection');
+
+            // Collect data from all years
+            const years = Object.keys(HARDCODED_DATA).sort();
+            const grossBeforeFA = [];
+            const financialAid = [];
+            const netRevenue = [];
+            const collections = [];
+            const outstanding = [];
+            const fallStudents = [];
+
+            years.forEach(year => {
+                const yearData = HARDCODED_DATA[year];
+                grossBeforeFA.push(yearData.totals.gross_before_fa || 0);
+                financialAid.push(yearData.totals.financial_aid || 0);
+                netRevenue.push(yearData.totals.net_revenue || 0);
+                collections.push(yearData.totals.collections || 0);
+                outstanding.push(yearData.totals.outstanding || 0);
+
+                // Find Fall semester data for student count
+                const fallSem = Object.keys(yearData.semesters).find(s => s.includes('Fall'));
+                if (fallSem && yearData.semesters[fallSem]) {
+                    fallStudents.push(yearData.semesters[fallSem].students || 0);
+                } else {
+                    fallStudents.push(0);
+                }
+            });
+
+            // Clear existing trend charts
+            if (charts.trendCharts) {
+                Object.values(charts.trendCharts).forEach(chart => {
+                    if (chart) chart.destroy();
+                });
+            }
+            charts.trendCharts = {};
+
+            // Create chart containers
+            graphsSection.innerHTML = `
+                <div class="chart-card">
+                    <h3 class="chart-title">Gross Amount & Financial Aid Trends</h3>
+                    <div class="chart-container">
+                        <canvas id="grossFATrendChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Net Revenue & Collections Trends</h3>
+                    <div class="chart-container">
+                        <canvas id="revenueCollectionsTrendChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Outstanding Amount Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="outstandingTrendChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Fall Semester Student Enrollment</h3>
+                    <div class="chart-container">
+                        <canvas id="studentsTrendChart"></canvas>
+                    </div>
+                </div>
+            `;
+
+            // Create Gross Amount & Financial Aid chart
+            const ctx1 = document.getElementById('grossFATrendChart').getContext('2d');
+            charts.trendCharts.grossFA = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Gross Amount (Before FA)',
+                            data: grossBeforeFA,
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Financial Aid',
+                            data: financialAid,
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        datalabels: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000000).toFixed(0) + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Create Net Revenue & Collections chart
+            const ctx2 = document.getElementById('revenueCollectionsTrendChart').getContext('2d');
+            charts.trendCharts.revenueCollections = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Net Revenue',
+                            data: netRevenue,
+                            borderColor: '#9b59b6',
+                            backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Collections',
+                            data: collections,
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        datalabels: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000000).toFixed(0) + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Create Outstanding Amount chart
+            const ctx3 = document.getElementById('outstandingTrendChart').getContext('2d');
+            charts.trendCharts.outstanding = new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Outstanding Amount',
+                        data: outstanding,
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        datalabels: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000000).toFixed(1) + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Create Student Enrollment chart
+            const ctx4 = document.getElementById('studentsTrendChart').getContext('2d');
+            charts.trendCharts.students = new Chart(ctx4, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Fall Semester Students',
+                        data: fallStudents,
+                        borderColor: '#16a085',
+                        backgroundColor: 'rgba(22, 160, 133, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        datalabels: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
                         }
                     }
                 }
