@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIU Financial Dashboard 2024-2025</title>
+    <title>LIU Financial Dashboard - All Years</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <style>
@@ -31,7 +31,7 @@
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 3px solid #667eea;
         }
@@ -47,6 +47,62 @@
             color: #7f8c8d;
             font-size: 1.2rem;
             font-weight: 300;
+        }
+
+        /* Year Selector Styles */
+        .year-selector {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .year-selector-title {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .year-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .year-btn {
+            background: white;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .year-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: #f8f9fa;
+        }
+
+        .year-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .year-btn.loading {
+            opacity: 0.6;
+            cursor: wait;
         }
 
         .alert-banner {
@@ -75,7 +131,7 @@
             padding-bottom: 40px;
             border-bottom: 2px solid #e9ecef;
         }
-        
+
         .semester-section:last-child {
             border-bottom: none;
             margin-bottom: 30px;
@@ -133,7 +189,7 @@
         .semester-metrics {
             margin-bottom: 30px;
         }
-        
+
         .currency-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -333,20 +389,6 @@
             color: #7f8c8d;
         }
 
-        .trend-indicator {
-            display: inline-block;
-            margin-left: 10px;
-            font-size: 1.2rem;
-        }
-
-        .trend-up {
-            color: #27ae60;
-        }
-
-        .trend-down {
-            color: #e74c3c;
-        }
-
         .charts-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -376,30 +418,6 @@
 
         .full-width {
             grid-column: 1 / -1;
-        }
-
-        .gauge-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            height: 400px;
-        }
-
-        .gauge-item {
-            text-align: center;
-        }
-
-        .gauge-label {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .gauge-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-top: 10px;
         }
 
         .waterfall-legend {
@@ -453,21 +471,35 @@
         .positive { color: #27ae60; font-weight: 600; }
         .negative { color: #e74c3c; font-weight: 600; }
 
+        .error-message {
+            background: #fee;
+            border: 2px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            color: #c0392b;
+        }
+
         @media (max-width: 768px) {
             .charts-section {
                 grid-template-columns: 1fr;
             }
-            
+
             .kpi-section {
                 grid-template-columns: 1fr;
             }
-            
+
             .currency-row {
                 grid-template-columns: 1fr;
             }
-            
+
             .header h1 {
                 font-size: 2rem;
+            }
+
+            .year-buttons {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             }
         }
     </style>
@@ -476,390 +508,805 @@
     <div class="dashboard-container">
         <div class="header">
             <h1>LIU Financial Dashboard</h1>
-            <p class="subtitle">Financial Performance Analysis by Semester • LUSD & CUSD • Academic Year 2024-2025</p>
+            <p class="subtitle">Comprehensive Financial Performance Analysis • All Academic Years</p>
         </div>
 
-        <!-- Financial Alert -->
-        <div class="alert-banner">
-            <h3>✅ Strong Financial Performance</h3>
-            <p>Cash surplus of $39.23M (collections $62.72M - expenses $23.49M) • Expected surplus of $53.93M if all receivables collected • Total Reserves: $37.52M</p>
-        </div>
-
-        <!-- Currency Conversion Note -->
-        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 15px; margin-bottom: 30px; text-align: center;">
-            <h4 style="color: #856404; margin-bottom: 5px; font-size: 1.1rem;">📊 Currency Conversion Note</h4>
-            <p style="color: #856404; margin: 0; font-weight: 500;">LUSD amounts are displayed in original currency with USD conversion shown below<br>Conversion rate: LUSD × 35,000 ÷ 89,700 = USD</p>
-        </div>
-
-        <!-- Overall KPIs -->
-        <div class="kpi-section">
-            <div class="kpi-card revenue">
-                <div class="kpi-header">
-                    <div class="kpi-title">Total Gross Amount (Before FA)</div>
-                    <div class="kpi-icon revenue">📈</div>
-                </div>
-                <div class="kpi-value">$141.00M</div>
-                <div class="kpi-change">Total amount before financial aid deductions</div>
-            </div>
-
-            <div class="kpi-card fa">
-                <div class="kpi-header">
-                    <div class="kpi-title">Financial Aid</div>
-                    <div class="kpi-icon fa">🎓</div>
-                </div>
-                <div class="kpi-value">$45.13M</div>
-                <div class="kpi-change">32.0% of gross amount</div>
-            </div>
-
-            <div class="kpi-card" style="border-color: #16a085;">
-                <div class="kpi-header">
-                    <div class="kpi-title">Gross Revenue (After FA)</div>
-                    <div class="kpi-icon" style="background: #16a085;">💵</div>
-                </div>
-                <div class="kpi-value" style="color: #16a085;">$95.88M</div>
-                <div class="kpi-change">Total Gross - FA ($141.00M - $45.13M)</div>
-            </div>
-
-            <div class="kpi-card revenue">
-                <div class="kpi-header">
-                    <div class="kpi-title">Net Revenue</div>
-                    <div class="kpi-icon revenue">💰</div>
-                </div>
-                <div class="kpi-value">$77.42M</div>
-                <div class="kpi-change">80.7% of Gross Revenue after FA | CUSD: $65.60M | LUSD: 30,274,027 (≈$11.81M USD)</div>
-            </div>
-
-
-            <div class="kpi-card collections">
-                <div class="kpi-header">
-                    <div class="kpi-title">Total Collections</div>
-                    <div class="kpi-icon collections">💵</div>
-                </div>
-                <div class="kpi-value">$62.72M</div>
-                <div class="kpi-change">CUSD: $53.16M | LUSD: 24,519,281 (≈$9.57M USD)</div>
-            </div>
-
-            <div class="kpi-card outstanding">
-                <div class="kpi-header">
-                    <div class="kpi-title">Total Outstanding</div>
-                    <div class="kpi-icon outstanding">📊</div>
-                </div>
-                <div class="kpi-value">$14.69M</div>
-                <div class="kpi-change">CUSD: $12.45M | LUSD: 5,754,746 (≈$2.25M USD)</div>
-            </div>
-
-            <div class="kpi-card expenses">
-                <div class="kpi-header">
-                    <div class="kpi-title">Operating Expenses</div>
-                    <div class="kpi-icon expenses">💸</div>
-                </div>
-                <div class="kpi-value">$23.49M</div>
-                <div class="kpi-change">Oct 2024 - June 2025</div>
-            </div>
-
-            <div class="kpi-card result">
-                <div class="kpi-header">
-                    <div class="kpi-title">Cash Operating Result</div>
-                    <div class="kpi-icon result">💵</div>
-                </div>
-                <div class="kpi-value positive">+$39.23M</div>
-                <div class="kpi-change">Actual surplus (based on collections)</div>
-            </div>
-
-            <div class="kpi-card result">
-                <div class="kpi-header">
-                    <div class="kpi-title">Expected Operating Result</div>
-                    <div class="kpi-icon result">📈</div>
-                </div>
-                <div class="kpi-value positive">+$53.93M</div>
-                <div class="kpi-change">Expected surplus (if all collected)</div>
-            </div>
-
-            <div class="kpi-card" style="border-color: #2ecc71;">
-                <div class="kpi-header">
-                    <div class="kpi-title">Total Cash Reserves</div>
-                    <div class="kpi-icon" style="background: #2ecc71;">💎</div>
-                </div>
-                <div class="kpi-value" style="color: #2ecc71;">$37.52M</div>
-                <div class="kpi-change">Total reserves</div>
+        <!-- Year Selector -->
+        <div class="year-selector">
+            <div class="year-selector-title">📊 Select Academic Year</div>
+            <div class="year-buttons" id="yearButtons">
+                <!-- Year buttons will be populated here -->
             </div>
         </div>
 
-        <!-- Reserves Section -->
-        <div style="margin: 40px 0 30px 0;">
-            <h2 style="text-align: center; color: #2c3e50; font-size: 2rem; margin-bottom: 10px;">Cash Reserves by Semester</h2>
-            <p style="text-align: center; color: #7f8c8d; font-size: 1.1rem; margin-bottom: 30px;">Available cash reserves breakdown by academic semester</p>
-        </div>
-
-        <div class="kpi-section" style="margin-bottom: 50px;">
-            <div class="kpi-card" style="border-color: #3498db;">
-                <div class="kpi-header">
-                    <div class="kpi-title">Fall Reserves</div>
-                    <div class="kpi-icon" style="background: #3498db;">🍂</div>
-                </div>
-                <div class="kpi-value" style="color: #3498db;">$14.47M</div>
-                <div class="kpi-change">October - January</div>
-                <div class="progress-bar" style="margin-top: 15px;">
-                    <div class="progress-fill" style="width: 38.6%; background: #3498db;"></div>
-                </div>
-                <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; color: #7f8c8d;">38.6% of total reserves</div>
+        <!-- Main Content Container -->
+        <div id="mainContent" style="display: none;">
+            <!-- Financial Alert -->
+            <div class="alert-banner" id="alertBanner">
+                <h3 id="alertTitle">Select a year to view financial data</h3>
+                <p id="alertText">Choose from available academic years above</p>
             </div>
 
-            <div class="kpi-card" style="border-color: #9b59b6;">
-                <div class="kpi-header">
-                    <div class="kpi-title">Spring Reserves</div>
-                    <div class="kpi-icon" style="background: #9b59b6;">🌸</div>
-                </div>
-                <div class="kpi-value" style="color: #9b59b6;">$17.73M</div>
-                <div class="kpi-change">February - June</div>
-                <div class="progress-bar" style="margin-top: 15px;">
-                    <div class="progress-fill" style="width: 47.2%; background: #9b59b6;"></div>
-                </div>
-                <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; color: #7f8c8d;">47.2% of total reserves</div>
+            <!-- Currency Conversion Note -->
+            <div id="currencyNote" style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 15px; margin-bottom: 30px; text-align: center; display: none;">
+                <h4 style="color: #856404; margin-bottom: 5px; font-size: 1.1rem;">📊 Currency Conversion Note</h4>
+                <p style="color: #856404; margin: 0; font-weight: 500;">LUSD amounts are displayed in original currency with USD conversion shown below<br>Conversion rate: <span id="conversionRate">LUSD × Exchange Rate ÷ 89,700 = USD</span></p>
             </div>
 
-            <div class="kpi-card" style="border-color: #e67e22;">
-                <div class="kpi-header">
-                    <div class="kpi-title">Summer Reserves</div>
-                    <div class="kpi-icon" style="background: #e67e22;">☀️</div>
-                </div>
-                <div class="kpi-value" style="color: #e67e22;">$5.32M</div>
-                <div class="kpi-change">July - September</div>
-                <div class="progress-bar" style="margin-top: 15px;">
-                    <div class="progress-fill" style="width: 14.2%; background: #e67e22;"></div>
-                </div>
-                <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; color: #7f8c8d;">14.2% of total reserves</div>
+            <!-- Overall KPIs -->
+            <div class="kpi-section" id="kpiSection">
+                <!-- KPI cards will be populated here -->
             </div>
-        </div>
 
-        <!-- Semester Sections -->
-        <div style="margin: 40px 0 30px 0;">
-            <h2 style="text-align: center; color: #2c3e50; font-size: 2rem; margin-bottom: 10px;">Semester Performance Details</h2>
-            <p style="text-align: center; color: #7f8c8d; font-size: 1.1rem; margin-bottom: 30px;">Financial metrics breakdown by semester with collection performance</p>
-        </div>
-        <div id="semesterSections"></div>
-
-        <!-- Charts Section -->
-        <div class="charts-section">
-            <div class="chart-card full-width">
-                <h3 class="chart-title">Revenue Waterfall Analysis</h3>
-                <div class="chart-container">
-                    <canvas id="waterfallChart"></canvas>
+            <!-- Reserves Section -->
+            <div id="reservesSection" style="display: none;">
+                <div style="margin: 40px 0 30px 0;">
+                    <h2 style="text-align: center; color: #2c3e50; font-size: 2rem; margin-bottom: 10px;">Cash Reserves by Semester</h2>
+                    <p style="text-align: center; color: #7f8c8d; font-size: 1.1rem; margin-bottom: 30px;">Available cash reserves breakdown by academic semester</p>
                 </div>
-                <div class="waterfall-legend">
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #3498db;"></div>
-                        <span>Revenue</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #e74c3c;"></div>
-                        <span>Deduction</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-color" style="background: #27ae60;"></div>
-                        <span>Net Result</span>
-                    </div>
+                <div class="kpi-section" id="reservesKpiSection" style="margin-bottom: 50px;">
+                    <!-- Reserves KPI cards will be populated here -->
                 </div>
             </div>
 
-            <div class="chart-card">
-                <h3 class="chart-title">Collection Performance by Semester</h3>
-                <div class="chart-container">
-                    <canvas id="collectionPerformanceChart"></canvas>
-                </div>
+            <!-- Semester Sections -->
+            <div style="margin: 40px 0 30px 0;">
+                <h2 style="text-align: center; color: #2c3e50; font-size: 2rem; margin-bottom: 10px;">Semester Performance Details</h2>
+                <p style="text-align: center; color: #7f8c8d; font-size: 1.1rem; margin-bottom: 30px;">Financial metrics breakdown by semester with collection performance</p>
+            </div>
+            <div id="semesterSections"></div>
+
+            <!-- Charts Section -->
+            <div class="charts-section" id="chartsSection">
+                <!-- Charts will be populated here -->
             </div>
 
-            <div class="chart-card">
-                <h3 class="chart-title">Top Expense Categories</h3>
-                <div class="chart-container">
-                    <canvas id="expenseCategoriesChart"></canvas>
-                </div>
+            <!-- Summary Table -->
+            <div class="chart-card" id="summaryTableCard">
+                <h3 class="chart-title">Financial Summary</h3>
+                <table class="data-table" id="summaryTable">
+                    <!-- Table will be populated here -->
+                </table>
             </div>
-
-
-            <div class="chart-card">
-                <h3 class="chart-title">Outstanding Balance Heatmap</h3>
-                <div class="chart-container">
-                    <canvas id="heatmapChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card">
-                <h3 class="chart-title">Currency Mix Analysis</h3>
-                <div class="chart-container">
-                    <canvas id="currencyMixChart"></canvas>
-                </div>
-            </div>
-
-            <div class="chart-card full-width">
-                <h3 class="chart-title">Monthly Cash Reserves Distribution</h3>
-                <div class="chart-container">
-                    <canvas id="monthlyReservesChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Summary Table -->
-        <div class="chart-card">
-            <h3 class="chart-title">Financial Summary</h3>
-            <table class="data-table">
-                <tr>
-                    <td><strong>Total Gross Amount (Before FA)</strong></td>
-                    <td class="number"><strong>$141,002,753</strong></td>
-                </tr>
-                <tr>
-                    <td>Financial Aid Distributed</td>
-                    <td class="number negative">-$45,125,147</td>
-                </tr>
-                <tr style="background-color: #f0f8ff;">
-                    <td><strong>Gross Revenue (After FA)</strong></td>
-                    <td class="number"><strong>$95,877,606</strong></td>
-                </tr>
-                <tr style="background-color: #e8f5e8;">
-                    <td><strong>Net Revenue</strong></td>
-                    <td class="number"><strong>$77,416,187</strong> <span style="color: #16a085; font-size: 0.9rem;">(80.7% of Gross after FA)</span></td>
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;&nbsp;&nbsp;CUSD Component</td>
-                    <td class="number">$65,603,579</td>
-                </tr>
-                <tr>
-                    <td>&nbsp;&nbsp;&nbsp;&nbsp;LUSD Component</td>
-                    <td class="number">LUSD: 30,274,027 (≈$11,812,608)</td>
-                </tr>
-                <tr>
-                    <td>Operating Expenses</td>
-                    <td class="number negative">-$23,489,459</td>
-                </tr>
-                <tr style="background-color: #d4edda;">
-                    <td><strong>Expected Operating Result</strong></td>
-                    <td class="number positive"><strong>+$53,926,728</strong></td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="padding-top: 20px;"><strong>Cash Position Analysis</strong></td>
-                </tr>
-                <tr>
-                    <td>Total Collections to Date</td>
-                    <td class="number">$62,722,379</td>
-                </tr>
-                <tr>
-                    <td>Operating Expenses</td>
-                    <td class="number negative">-$23,489,459</td>
-                </tr>
-                <tr style="background-color: #d4edda;">
-                    <td><strong>Cash Operating Result</strong></td>
-                    <td class="number positive"><strong>+$39,232,920</strong></td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="padding-top: 20px;"><strong>Cash Reserves Analysis</strong></td>
-                </tr>
-                <tr>
-                    <td>Fall Semester Reserves (Oct-Jan)</td>
-                    <td class="number">$14,470,646</td>
-                </tr>
-                <tr>
-                    <td>Spring Semester Reserves (Feb-Jun)</td>
-                    <td class="number">$17,729,073</td>
-                </tr>
-                <tr>
-                    <td>Summer Semester Reserves (Jul-Sep)</td>
-                    <td class="number">$5,320,759</td>
-                </tr>
-                <tr style="background-color: #e8f5e8;">
-                    <td><strong>Total Cash Reserves</strong></td>
-                    <td class="number"><strong>$37,520,477</strong></td>
-                </tr>
-            </table>
         </div>
     </div>
 
     <script>
-        // Financial data
-        const financialData = {
-            "reserves": {
-                "monthly": [
-                    {"month": "October", "amount": 1545338.52, "semester": "Fall"},
-                    {"month": "November", "amount": 1460873.72, "semester": "Fall"},
-                    {"month": "December", "amount": 3774687.91, "semester": "Fall"},
-                    {"month": "January", "amount": 7689745.59, "semester": "Fall"},
-                    {"month": "February", "amount": 4467591.43, "semester": "Spring"},
-                    {"month": "March", "amount": 3016262.56, "semester": "Spring"},
-                    {"month": "April", "amount": 2651571.41, "semester": "Spring"},
-                    {"month": "May", "amount": 4609937.71, "semester": "Spring"},
-                    {"month": "June", "amount": 2983709.51, "semester": "Spring"},
-                    {"month": "July", "amount": 887359.18, "semester": "Summer"},
-                    {"month": "August", "amount": 561318.84, "semester": "Summer"},
-                    {"month": "September", "amount": 3872080.86, "semester": "Summer"}
-                ],
-                "by_semester": {
-                    "Fall": 14470645.75,
-                    "Spring": 17729072.62,
-                    "Summer": 5320758.88
-                },
-                "total": 37520477.25
-            },
-            "semesters": {
-                "Fall_2024_2025": {
-                    "semester": "Fall_2024_2025",
-                    "students": 26585,
-                    "students_excluding_drop": 24462,
-                    "total_paid_lusd": 11938215,
-                    "total_unpaid_lusd": 2663199,
-                    "total_paid_percent_lusd": 81.76,
-                    "total_paid_cusd": 25352967,
-                    "total_unpaid_cusd": 5202827,
-                    "total_paid_percent_cusd": 82.97,
-                    "fa_amounts": 21220051.42,
-                    "before_fa": 66377259.42,
-                    "total_expected_revenue_lusd": 14601414,
-                    "total_expected_revenue_cusd": 30555794
-                },
-                "Spring_2024_2025": {
-                    "semester": "Spring_2024_2025",
-                    "students": 23542,
-                    "students_excluding_drop": 23269,
-                    "total_paid_lusd": 11012899,
-                    "total_unpaid_lusd": 2684869,
-                    "total_paid_percent_lusd": 80.40,
-                    "total_paid_cusd": 23797222,
-                    "total_unpaid_cusd": 6043389,
-                    "total_paid_percent_cusd": 79.75,
-                    "fa_amounts": 20974995.88,
-                    "before_fa": 64513374.88,
-                    "total_expected_revenue_lusd": 13697768,
-                    "total_expected_revenue_cusd": 29840611
-                },
-                "Summer_2024_2025": {
-                    "semester": "Summer_2024_2025",
-                    "students": 9236,
-                    "students_excluding_drop": 8232,
-                    "total_paid_lusd": 1568167,
-                    "total_unpaid_lusd": 406678,
-                    "total_paid_percent_lusd": 79.41,
-                    "total_paid_cusd": 4005023,
-                    "total_unpaid_cusd": 1202151,
-                    "total_paid_percent_cusd": 76.91,
-                    "fa_amounts": 2930099.94,
-                    "before_fa": 10112118.94,
-                    "total_expected_revenue_lusd": 1974845,
-                    "total_expected_revenue_cusd": 5207174
-                }
-            },
-            "expenses": {
-                "top_categories": [
-                    ["Part-Time Salaries", 7722048.57],
-                    ["Full-Time Salaries", 6935814.14],
-                    ["VP Expenses", 844981.82],
-                    ["Income Tax", 742970],
-                    ["Insurance", 444740.11],
-                    ["Faculty Children Education", 365652.34]
-                ]
-            }
-        };
+        // Hardcoded data embedded directly in the HTML
+        const HARDCODED_DATA = {
+  "2015-2016": {
+    "year": "2015-2016",
+    "semesters": {
+      "Summer_2015_2016": {
+        "semester": "Summer_2015_2016",
+        "students": 10502,
+        "students_excluding_drop": 9190,
+        "total_paid_lusd": 398040.0,
+        "total_unpaid_lusd": 354322.0,
+        "total_paid_percent_lusd": 52.90538331282,
+        "total_paid_cusd": 4856470.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 3611030.45,
+        "before_fa": 9219862.45,
+        "total_expected_revenue_lusd": 752362.0,
+        "total_expected_revenue_cusd": 4856470.0
+      },
+      "Spring_2015_2016": {
+        "semester": "Spring_2015_2016",
+        "students": 18861,
+        "students_excluding_drop": 18544,
+        "total_paid_lusd": 1321486.0,
+        "total_unpaid_lusd": 2063678.0,
+        "total_paid_percent_lusd": 39.037576909125,
+        "total_paid_cusd": 22285832.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 16561854.94,
+        "before_fa": 42232850.94,
+        "total_expected_revenue_lusd": 3385164.0,
+        "total_expected_revenue_cusd": 22285832.0
+      },
+      "Fall_2015_2016": {
+        "semester": "Fall_2015_2016",
+        "students": 20609,
+        "students_excluding_drop": 19956,
+        "total_paid_lusd": 1014570.0,
+        "total_unpaid_lusd": 2655892.0,
+        "total_paid_percent_lusd": 27.641479464983,
+        "total_paid_cusd": 24393185.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 17119084.78,
+        "before_fa": 45182731.78,
+        "total_expected_revenue_lusd": 3670462.0,
+        "total_expected_revenue_cusd": 24393185.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 96635445.17,
+      "financial_aid": 37291970.17,
+      "gross_after_fa": 59343475.0,
+      "net_revenue": 54582082.09476031,
+      "collections": 52602302.607580826,
+      "outstanding": 1979779.487179487,
+      "expenses": 0
+    }
+  },
+  "2016-2017": {
+    "year": "2016-2017",
+    "semesters": {
+      "Summer_2016_2017": {
+        "semester": "Summer_2016_2017",
+        "students": 11720,
+        "students_excluding_drop": 10361,
+        "total_paid_lusd": 762621.0,
+        "total_unpaid_lusd": 463626.0,
+        "total_paid_percent_lusd": 62.191467135088,
+        "total_paid_cusd": 5014991.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 4476780.55,
+        "before_fa": 10718018.55,
+        "total_expected_revenue_lusd": 1226247.0,
+        "total_expected_revenue_cusd": 5014991.0
+      },
+      "Spring_2016_2017": {
+        "semester": "Spring_2016_2017",
+        "students": 20739,
+        "students_excluding_drop": 20415,
+        "total_paid_lusd": 2423163.0,
+        "total_unpaid_lusd": 2383202.0,
+        "total_paid_percent_lusd": 50.415709168987,
+        "total_paid_cusd": 22913334.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 20328910.97,
+        "before_fa": 48048609.97,
+        "total_expected_revenue_lusd": 4806365.0,
+        "total_expected_revenue_cusd": 22913334.0
+      },
+      "Fall_2016_2017": {
+        "semester": "Fall_2016_2017",
+        "students": 22685,
+        "students_excluding_drop": 21810,
+        "total_paid_lusd": 1890961.0,
+        "total_unpaid_lusd": 2972519.0,
+        "total_paid_percent_lusd": 38.880821962874,
+        "total_paid_cusd": 25200664.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 20795638.45,
+        "before_fa": 50859782.45,
+        "total_expected_revenue_lusd": 4863480.0,
+        "total_expected_revenue_cusd": 25200664.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 109626410.97,
+      "financial_aid": 45601329.97,
+      "gross_after_fa": 64025081.0,
+      "net_revenue": 57380529.91415831,
+      "collections": 55109881.69788183,
+      "outstanding": 2270648.216276477,
+      "expenses": 0
+    }
+  },
+  "2017-2018": {
+    "year": "2017-2018",
+    "semesters": {
+      "Summer_2017_2018": {
+        "semester": "Summer_2017_2018",
+        "students": 13666,
+        "students_excluding_drop": 11833,
+        "total_paid_lusd": 0,
+        "total_unpaid_lusd": 0,
+        "total_paid_percent_lusd": 73.691671933808,
+        "total_paid_cusd": 5091008.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 5263037.68,
+        "before_fa": 12203562.68,
+        "total_expected_revenue_lusd": 1849517.0,
+        "total_expected_revenue_cusd": 5091008.0
+      },
+      "Spring_2017_2018": {
+        "semester": "Spring_2017_2018",
+        "students": 23339,
+        "students_excluding_drop": 22866,
+        "total_paid_lusd": 4455975.0,
+        "total_unpaid_lusd": 2637398.0,
+        "total_paid_percent_lusd": 62.818845138977,
+        "total_paid_cusd": 23612858.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 24621356.84,
+        "before_fa": 55327587.84,
+        "total_expected_revenue_lusd": 7093373.0,
+        "total_expected_revenue_cusd": 23612858.0
+      },
+      "Fall_2017_2018": {
+        "semester": "Fall_2017_2018",
+        "students": 25669,
+        "students_excluding_drop": 24590,
+        "total_paid_lusd": 3365305.0,
+        "total_unpaid_lusd": 3511339.0,
+        "total_paid_percent_lusd": 48.938188453554,
+        "total_paid_cusd": 26770036.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 25450925.7,
+        "before_fa": 59097605.7,
+        "total_expected_revenue_lusd": 6876644.0,
+        "total_expected_revenue_cusd": 26770036.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 126628756.22000001,
+      "financial_aid": 55335320.22,
+      "gross_after_fa": 71293436.00000001,
+      "net_revenue": 61646518.38795987,
+      "collections": 58525683.493868455,
+      "outstanding": 2399172.7424749164,
+      "expenses": 0
+    }
+  },
+  "2018-2019": {
+    "year": "2018-2019",
+    "semesters": {
+      "Summer_2018_2019": {
+        "semester": "Summer_2018_2019",
+        "students": 13626,
+        "students_excluding_drop": 11998,
+        "total_paid_lusd": 0,
+        "total_unpaid_lusd": 0,
+        "total_paid_percent_lusd": 87.98595482787,
+        "total_paid_cusd": 3952841.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 5825324.09,
+        "before_fa": 12780193.09,
+        "total_expected_revenue_lusd": 3002028.0,
+        "total_expected_revenue_cusd": 3952841.0
+      },
+      "Spring_2018_2019": {
+        "semester": "Spring_2018_2019",
+        "students": 25313,
+        "students_excluding_drop": 24873,
+        "total_paid_lusd": 9541249.0,
+        "total_unpaid_lusd": 2788910.0,
+        "total_paid_percent_lusd": 77.381394676257,
+        "total_paid_cusd": 20832199.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 28474432.67,
+        "before_fa": 61636790.67,
+        "total_expected_revenue_lusd": 12330159.0,
+        "total_expected_revenue_cusd": 20832199.0
+      },
+      "Fall_2018_2019": {
+        "semester": "Fall_2018_2019",
+        "students": 27798,
+        "students_excluding_drop": 26790,
+        "total_paid_lusd": 7001864.0,
+        "total_unpaid_lusd": 3772859.0,
+        "total_paid_percent_lusd": 64.984167110375,
+        "total_paid_cusd": 25524795.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 29594723.8,
+        "before_fa": 65894241.8,
+        "total_expected_revenue_lusd": 10774723.0,
+        "total_expected_revenue_cusd": 25524795.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 140311225.56,
+      "financial_aid": 63894480.56,
+      "gross_after_fa": 76416745.0,
+      "net_revenue": 60496477.697881825,
+      "collections": 56764784.33110368,
+      "outstanding": 2560333.5005574133,
+      "expenses": 0
+    }
+  },
+  "2019-2020": {
+    "year": "2019-2020",
+    "semesters": {
+      "Summer_2019_2020": {
+        "semester": "Summer_2019_2020",
+        "students": 13675,
+        "students_excluding_drop": 12905,
+        "total_paid_lusd": 7480701.0,
+        "total_unpaid_lusd": 256092.0,
+        "total_paid_percent_lusd": 96.68994633823101,
+        "total_paid_cusd": 24685.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 7103990.0,
+        "before_fa": 14865468.0,
+        "total_expected_revenue_lusd": 7736793.0,
+        "total_expected_revenue_cusd": 24685.0
+      },
+      "Spring_2019_2020": {
+        "semester": "Spring_2019_2020",
+        "students": 26278,
+        "students_excluding_drop": 25791,
+        "total_paid_lusd": 31753894.0,
+        "total_unpaid_lusd": 2871619.0,
+        "total_paid_percent_lusd": 91.706638396953,
+        "total_paid_cusd": 208914.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 32622343.37,
+        "before_fa": 67456770.37,
+        "total_expected_revenue_lusd": 34625513.0,
+        "total_expected_revenue_cusd": 208914.0
+      },
+      "Fall_2019_2020": {
+        "semester": "Fall_2019_2020",
+        "students": 29530,
+        "students_excluding_drop": 28585,
+        "total_paid_lusd": 26466696.0,
+        "total_unpaid_lusd": 4207049.0,
+        "total_paid_percent_lusd": 86.284527696243,
+        "total_paid_cusd": 7906296.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 33918940.08,
+        "before_fa": 72498981.08,
+        "total_expected_revenue_lusd": 30673745.0,
+        "total_expected_revenue_cusd": 7906296.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 154821219.45,
+      "financial_aid": 73645273.45,
+      "gross_after_fa": 81175945.99999999,
+      "net_revenue": 36637796.72798216,
+      "collections": 33775850.239687845,
+      "outstanding": 2861946.488294314,
+      "expenses": 0
+    }
+  },
+  "2020-2021": {
+    "year": "2020-2021",
+    "semesters": {
+      "Summer_2020_2021": {
+        "semester": "Summer_2020_2021",
+        "students": 18749,
+        "students_excluding_drop": 17869,
+        "total_paid_lusd": 0,
+        "total_unpaid_lusd": 0,
+        "total_paid_percent_lusd": 95.46991970920101,
+        "total_paid_cusd": 8155.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 9559301.2199999,
+        "before_fa": 21789778.22,
+        "total_expected_revenue_lusd": 12222322.0,
+        "total_expected_revenue_cusd": 8155.0
+      },
+      "Spring_2020_2021": {
+        "semester": "Spring_2020_2021",
+        "students": 28585,
+        "students_excluding_drop": 28282,
+        "total_paid_lusd": 41007864.0,
+        "total_unpaid_lusd": 2793815.0,
+        "total_paid_percent_lusd": 93.621671443234,
+        "total_paid_cusd": 33972.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 36746514.74,
+        "before_fa": 80582165.74,
+        "total_expected_revenue_lusd": 43801679.0,
+        "total_expected_revenue_cusd": 33972.0
+      },
+      "Fall_2020_2021": {
+        "semester": "Fall_2020_2021",
+        "students": 30768,
+        "students_excluding_drop": 30024,
+        "total_paid_lusd": 42642049.0,
+        "total_unpaid_lusd": 4005354.0,
+        "total_paid_percent_lusd": 91.413554147913,
+        "total_paid_cusd": 81285.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 39129219.81,
+        "before_fa": 85857907.81,
+        "total_expected_revenue_lusd": 46647403.0,
+        "total_expected_revenue_cusd": 81285.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 188229851.76999998,
+      "financial_aid": 85435035.7699999,
+      "gross_after_fa": 102794816.00000007,
+      "net_revenue": 40184717.90858416,
+      "collections": 32762731.453734674,
+      "outstanding": 2652964.492753623,
+      "expenses": 0
+    }
+  },
+  "2021-2022": {
+    "year": "2021-2022",
+    "semesters": {
+      "Summer_2021_2022": {
+        "semester": "Summer_2021_2022",
+        "students": 17475,
+        "students_excluding_drop": 16047,
+        "total_paid_lusd": 11680477.0,
+        "total_unpaid_lusd": 428286.0,
+        "total_paid_percent_lusd": 96.463007823342,
+        "total_paid_cusd": 2013.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 7188613.1999999,
+        "before_fa": 19299389.2,
+        "total_expected_revenue_lusd": 12108763.0,
+        "total_expected_revenue_cusd": 2013.0
+      },
+      "Spring_2021_2022": {
+        "semester": "Spring_2021_2022",
+        "students": 30123,
+        "students_excluding_drop": 29583,
+        "total_paid_lusd": 0,
+        "total_unpaid_lusd": 3223832.0,
+        "total_paid_percent_lusd": 93.423452907541,
+        "total_paid_cusd": 3756.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 31718374.35,
+        "before_fa": 80742261.35,
+        "total_expected_revenue_lusd": 49020131.0,
+        "total_expected_revenue_cusd": 3756.0
+      },
+      "Fall_2021_2022": {
+        "semester": "Fall_2021_2022",
+        "students": 34114,
+        "students_excluding_drop": 33201,
+        "total_paid_lusd": 49272383.0,
+        "total_unpaid_lusd": 5448063.0,
+        "total_paid_percent_lusd": 90.043825666187,
+        "total_paid_cusd": 68482.0,
+        "total_unpaid_cusd": 0,
+        "total_paid_percent_cusd": 100.0,
+        "fa_amounts": 36095536.91,
+        "before_fa": 90884464.91,
+        "total_expected_revenue_lusd": 54720446.0,
+        "total_expected_revenue_cusd": 68482.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 190926115.45999998,
+      "financial_aid": 75002524.45999989,
+      "gross_after_fa": 115923591.00000009,
+      "net_revenue": 45277449.439241916,
+      "collections": 23857418.22408027,
+      "outstanding": 3550795.2619843925,
+      "expenses": 0
+    }
+  },
+  "2022-2023": {
+    "year": "2022-2023",
+    "semesters": {
+      "Summer_2022_2023": {
+        "semester": "Summer_2022_2023",
+        "students": 12771,
+        "students_excluding_drop": 10760,
+        "total_paid_lusd": 0,
+        "total_unpaid_lusd": 0,
+        "total_paid_percent_lusd": 96.486441746778,
+        "total_paid_cusd": 3340160.0,
+        "total_unpaid_cusd": 169714.0,
+        "total_paid_percent_cusd": 95.164669728885,
+        "fa_amounts": 4418205.67,
+        "before_fa": 13316605.67,
+        "total_expected_revenue_lusd": 5388526.0,
+        "total_expected_revenue_cusd": 3509874.0
+      },
+      "Spring_2022_2023": {
+        "semester": "Spring_2022_2023",
+        "students": 27317,
+        "students_excluding_drop": 26678,
+        "total_paid_lusd": 28899437.0,
+        "total_unpaid_lusd": 1981068.0,
+        "total_paid_percent_lusd": 93.584729265276,
+        "total_paid_cusd": 13576793.0,
+        "total_unpaid_cusd": 1025595.0,
+        "total_paid_percent_cusd": 92.976525483366,
+        "fa_amounts": 25194376.63,
+        "before_fa": 70677269.63,
+        "total_expected_revenue_lusd": 30880505.0,
+        "total_expected_revenue_cusd": 14602388.0
+      },
+      "Fall_2022_2023": {
+        "semester": "Fall_2022_2023",
+        "students": 32128,
+        "students_excluding_drop": 29936,
+        "total_paid_lusd": 31149441.0,
+        "total_unpaid_lusd": 3209356.0,
+        "total_paid_percent_lusd": 90.65928879873199,
+        "total_paid_cusd": 14825306.0,
+        "total_unpaid_cusd": 1546117.0,
+        "total_paid_percent_cusd": 90.556001149075,
+        "fa_amounts": 27771486.16,
+        "before_fa": 78501706.16,
+        "total_expected_revenue_lusd": 34358797.0,
+        "total_expected_revenue_cusd": 16371423.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 162495581.45999998,
+      "financial_aid": 57384068.45999999,
+      "gross_after_fa": 105111512.99999999,
+      "net_revenue": 62041923.35005574,
+      "collections": 55172701.92084727,
+      "outstanding": 4766675.052396879,
+      "expenses": 0
+    }
+  },
+  "2023-2024": {
+    "year": "2023-2024",
+    "semesters": {
+      "Summer_2023_2024": {
+        "semester": "Summer_2023_2024",
+        "students": 11245,
+        "students_excluding_drop": 9946,
+        "total_paid_lusd": 3429436.0,
+        "total_unpaid_lusd": 251381.0,
+        "total_paid_percent_lusd": 93.170510786056,
+        "total_paid_cusd": 4325141.0,
+        "total_unpaid_cusd": 385305.0,
+        "total_paid_percent_cusd": 91.82020131427,
+        "fa_amounts": 3617867.9,
+        "before_fa": 12009130.9,
+        "total_expected_revenue_lusd": 3680817.0,
+        "total_expected_revenue_cusd": 4710446.0
+      },
+      "Spring_2023_2024": {
+        "semester": "Spring_2023_2024",
+        "students": 25888,
+        "students_excluding_drop": 25494,
+        "total_paid_lusd": 20228642.0,
+        "total_unpaid_lusd": 2134451.0,
+        "total_paid_percent_lusd": 90.455475009651,
+        "total_paid_cusd": 21007912.0,
+        "total_unpaid_cusd": 2363403.0,
+        "total_paid_percent_cusd": 89.887590835176,
+        "fa_amounts": 22931181.43,
+        "before_fa": 68665589.43,
+        "total_expected_revenue_lusd": 22363093.0,
+        "total_expected_revenue_cusd": 23371315.0
+      },
+      "Fall_2023_2024": {
+        "semester": "Fall_2023_2024",
+        "students": 29363,
+        "students_excluding_drop": 28387,
+        "total_paid_lusd": 22385976.0,
+        "total_unpaid_lusd": 2554079.0,
+        "total_paid_percent_lusd": 89.759128438169,
+        "total_paid_cusd": 23284426.0,
+        "total_unpaid_cusd": 2480435.0,
+        "total_paid_percent_cusd": 90.37279882860601,
+        "fa_amounts": 24951796.46,
+        "before_fa": 75656712.46,
+        "total_expected_revenue_lusd": 24940055.0,
+        "total_expected_revenue_cusd": 25764861.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 156331432.79000002,
+      "financial_aid": 51500845.79,
+      "gross_after_fa": 104830587.00000003,
+      "net_revenue": 73740030.86287627,
+      "collections": 66583386.35785953,
+      "outstanding": 7156644.505016723,
+      "expenses": 0
+    }
+  },
+  "2024-2025": {
+    "year": "2024-2025",
+    "semesters": {
+      "Summer_2024_2025": {
+        "semester": "Summer_2024_2025",
+        "students": 9236,
+        "students_excluding_drop": 8232,
+        "total_paid_lusd": 1576007.0,
+        "total_unpaid_lusd": 400556.0,
+        "total_paid_percent_lusd": 79.734721331928,
+        "total_paid_cusd": 4031184.0,
+        "total_unpaid_cusd": 1181015.0,
+        "total_paid_percent_cusd": 77.341329446554,
+        "fa_amounts": 2930099.94,
+        "before_fa": 10118861.94,
+        "total_expected_revenue_lusd": 1976563.0,
+        "total_expected_revenue_cusd": 5212199.0
+      },
+      "Spring_2024_2025": {
+        "semester": "Spring_2024_2025",
+        "students": 23542,
+        "students_excluding_drop": 23267,
+        "total_paid_lusd": 11058498.0,
+        "total_unpaid_lusd": 2638608.0,
+        "total_paid_percent_lusd": 80.736018250863,
+        "total_paid_cusd": 23901709.0,
+        "total_unpaid_cusd": 5950206.0,
+        "total_paid_percent_cusd": 80.067590303671,
+        "fa_amounts": 20977761.08,
+        "before_fa": 64526782.08,
+        "total_expected_revenue_lusd": 13697106.0,
+        "total_expected_revenue_cusd": 29851915.0
+      },
+      "Fall_2024_2025": {
+        "semester": "Fall_2024_2025",
+        "students": 26585,
+        "students_excluding_drop": 24462,
+        "total_paid_lusd": 11956883.0,
+        "total_unpaid_lusd": 2634531.0,
+        "total_paid_percent_lusd": 81.944649092953,
+        "total_paid_cusd": 25404691.0,
+        "total_unpaid_cusd": 5141328.0,
+        "total_paid_percent_cusd": 83.168582459141,
+        "fa_amounts": 21224778.47,
+        "before_fa": 66362211.47,
+        "total_expected_revenue_lusd": 14591414.0,
+        "total_expected_revenue_cusd": 30546019.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 141007855.49,
+      "financial_aid": 45132639.489999995,
+      "gross_after_fa": 95875216.00000001,
+      "net_revenue": 77419251.22742474,
+      "collections": 62932885.89520624,
+      "outstanding": 14486365.332218505,
+      "expenses": 23489459.28
+    },
+    "expenses": {
+      "top_categories": [
+        [
+          "Salaries & Benefits",
+          10570256.68
+        ],
+        [
+          "Operating Expenses",
+          4697891.86
+        ],
+        [
+          "Utilities & Maintenance",
+          3054829.71
+        ],
+        [
+          "Administrative Costs",
+          1879156.74
+        ],
+        [
+          "Insurance",
+          1409367.56
+        ],
+        [
+          "Technology & Equipment",
+          1644262.15
+        ],
+        [
+          "Other Expenses",
+          1174675.96
+        ]
+      ]
+    },
+    "reserves": {
+      "monthly": [
+        {
+          "month": "October",
+          "amount": 1545338.52,
+          "semester": "Fall"
+        },
+        {
+          "month": "November",
+          "amount": 1460873.72,
+          "semester": "Fall"
+        },
+        {
+          "month": "December",
+          "amount": 3774687.91,
+          "semester": "Fall"
+        },
+        {
+          "month": "January",
+          "amount": 7689745.59,
+          "semester": "Fall"
+        },
+        {
+          "month": "February",
+          "amount": 4467591.43,
+          "semester": "Spring"
+        },
+        {
+          "month": "March",
+          "amount": 3016262.56,
+          "semester": "Spring"
+        },
+        {
+          "month": "April",
+          "amount": 2651571.41,
+          "semester": "Spring"
+        },
+        {
+          "month": "May",
+          "amount": 4609937.71,
+          "semester": "Spring"
+        },
+        {
+          "month": "June",
+          "amount": 2983709.51,
+          "semester": "Spring"
+        },
+        {
+          "month": "July",
+          "amount": 887359.18,
+          "semester": "Summer"
+        },
+        {
+          "month": "August",
+          "amount": 561318.84,
+          "semester": "Summer"
+        },
+        {
+          "month": "September",
+          "amount": 3872080.86,
+          "semester": "Summer"
+        }
+      ],
+      "by_semester": {
+        "Fall": 14470645.75,
+        "Spring": 17729072.62,
+        "Summer": 5320758.88
+      },
+      "total": 37520477.25
+    }
+  },
+  "2025-2026": {
+    "year": "2025-2026",
+    "semesters": {
+      "Fall_2025_2026": {
+        "semester": "Fall_2025_2026",
+        "students": 20237,
+        "students_excluding_drop": 19935,
+        "total_paid_lusd": 44510.0,
+        "total_unpaid_lusd": 8979989.0,
+        "total_paid_percent_lusd": 0.49321297503607003,
+        "total_paid_cusd": 732101.0,
+        "total_unpaid_cusd": 31623948.0,
+        "total_paid_percent_cusd": 2.2626402871377,
+        "fa_amounts": 13937959.32,
+        "before_fa": 55318507.32,
+        "total_expected_revenue_lusd": 9024499.0,
+        "total_expected_revenue_cusd": 32356049.0
+      }
+    },
+    "totals": {
+      "gross_before_fa": 55318507.32,
+      "financial_aid": 13937959.32,
+      "gross_after_fa": 41380548.0,
+      "net_revenue": 35877313.9386845,
+      "collections": 749468.3355629877,
+      "outstanding": 35127845.60312152,
+      "expenses": 0
+    }
+  }
+};
 
+        // Global variables
+        let currentYear = null;
+        let charts = {};
+
+        // Initialize Chart.js with data labels plugin
         Chart.register(ChartDataLabels);
 
+        // Utility functions
         function formatCurrency(value) {
+            if (value === null || value === undefined || isNaN(value)) return '$0';
             return new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: 'USD',
@@ -869,17 +1316,33 @@
         }
 
         function formatLUSD(value) {
+            if (value === null || value === undefined || isNaN(value)) return '0';
             return new Intl.NumberFormat('en-US', {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             }).format(value);
         }
 
-        function convertLUSDtoUSD(lusdValue) {
-            return (lusdValue * 35000) / 89700;
+        // Only convert for 2024-2025 and 2025-2026
+        function shouldConvertLUSD(year) {
+            return year === '2024-2025' || year === '2025-2026';
+        }
+
+        function getExchangeRate(year) {
+            if (year === '2024-2025') return 35000;
+            if (year === '2025-2026') return 50000;
+            return null; // No conversion for other years
+        }
+
+        function convertLUSDtoUSD(lusdValue, year) {
+            if (!lusdValue || isNaN(lusdValue)) return 0;
+            if (!shouldConvertLUSD(year)) return lusdValue; // Return true value
+            const rate = getExchangeRate(year);
+            return (lusdValue * rate) / 89700;
         }
 
         function formatPercent(value) {
+            if (value === null || value === undefined || isNaN(value)) return '0.0%';
             return value.toFixed(1) + '%';
         }
 
@@ -895,264 +1358,524 @@
             return '✗';
         }
 
-        // Create semester sections
-        function createSemesterSections() {
-            const container = document.getElementById('semesterSections');
-            const semesters = ['Fall_2024_2025', 'Spring_2024_2025', 'Summer_2024_2025'];
-            
-            semesters.forEach((sem, index) => {
-                const data = financialData.semesters[sem];
-                const semesterName = sem.replace(/_/g, ' ').replace('2024 2025', '2024-2025');
-                const avgRate = (data.total_paid_percent_lusd + data.total_paid_percent_cusd) / 2;
-                
-                // Different border colors for each semester
-                const borderColors = ['#3498db', '#9b59b6', '#e67e22'];
-                const borderColor = borderColors[index];
-                
-                const section = document.createElement('div');
-                section.className = 'semester-section';
-                
-                section.innerHTML = `
-                    <div class="semester-header" style="border-left-color: ${borderColor}">
-                        <h2>${semesterName} • ${data.students.toLocaleString()} Students (${data.students_excluding_drop.toLocaleString()} Excluding Drop All)</h2>
-                        <div class="performance-badge">
-                            <div class="badge-item ${getPerformanceClass(data.total_paid_percent_cusd)}">
-                                ${getPerformanceIcon(data.total_paid_percent_cusd)} CUSD ${formatPercent(data.total_paid_percent_cusd)}
-                            </div>
-                            <div class="badge-item ${getPerformanceClass(data.total_paid_percent_lusd)}">
-                                ${getPerformanceIcon(data.total_paid_percent_lusd)} LUSD ${formatPercent(data.total_paid_percent_lusd)}
-                            </div>
+        // Initialize year selector
+        function initializeYearSelector() {
+            const container = document.getElementById('yearButtons');
+            container.innerHTML = '';
+
+            Object.keys(HARDCODED_DATA).forEach(year => {
+                const button = document.createElement('button');
+                button.className = 'year-btn';
+                button.textContent = year;
+                button.onclick = () => selectYear(year);
+                container.appendChild(button);
+            });
+        }
+
+        // Select and display a year
+        function selectYear(year) {
+            // Update button states
+            document.querySelectorAll('.year-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent === year) {
+                    btn.classList.add('active');
+                }
+            });
+
+            currentYear = year;
+            displayYearData(HARDCODED_DATA[year]);
+
+            // Show main content
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        // Display data for selected year
+        function displayYearData(data) {
+            if (!data) return;
+
+            // Update alert banner
+            updateAlertBanner(data);
+
+            // Show currency note only for 2024-2025 and 2025-2026
+            const showConversionNote = shouldConvertLUSD(data.year) &&
+                                       Object.values(data.semesters).some(s => s.total_expected_revenue_lusd > 0);
+
+            if (showConversionNote) {
+                document.getElementById('currencyNote').style.display = 'block';
+                const rate = getExchangeRate(data.year);
+                const rateText = `LUSD × ${rate.toLocaleString()} ÷ 89,700 = USD`;
+                document.getElementById('conversionRate').textContent = rateText;
+            } else {
+                document.getElementById('currencyNote').style.display = 'none';
+            }
+
+            // Update KPIs
+            updateKPIs(data);
+
+            // Update semester sections
+            updateSemesterSections(data);
+
+            // Update reserves ONLY for 2024-2025
+            if (data.year === '2024-2025' && data.reserves && data.reserves.total > 0) {
+                updateReserves(data.reserves);
+                document.getElementById('reservesSection').style.display = 'block';
+            } else {
+                document.getElementById('reservesSection').style.display = 'none';
+            }
+
+            // Create/update charts
+            updateCharts(data);
+
+            // Update summary table
+            updateSummaryTable(data);
+        }
+
+        // Update alert banner
+        function updateAlertBanner(data) {
+            // Only show financial performance if we have expense data (2024-2025)
+            if (data.totals.expenses && data.totals.expenses > 0) {
+                const surplus = data.totals.collections - data.totals.expenses;
+                const expectedSurplus = data.totals.net_revenue - data.totals.expenses;
+
+                let title, text, bannerClass;
+
+                if (surplus > 0) {
+                    title = '✅ Strong Financial Performance';
+                    text = `Cash surplus of ${formatCurrency(surplus)} • Expected surplus of ${formatCurrency(expectedSurplus)} if all receivables collected`;
+                    bannerClass = 'alert-banner';
+                } else {
+                    title = '⚠️ Financial Alert';
+                    text = `Operating deficit of ${formatCurrency(Math.abs(surplus))} • Action required to improve collections`;
+                    bannerClass = 'alert-banner warning';
+                }
+
+                document.getElementById('alertTitle').textContent = title;
+                document.getElementById('alertText').textContent = text;
+                document.getElementById('alertBanner').className = bannerClass;
+                document.getElementById('alertBanner').style.display = 'block';
+            } else {
+                // No expense data available for other years
+                document.getElementById('alertBanner').style.display = 'none';
+            }
+        }
+
+        // Update KPIs
+        function updateKPIs(data) {
+            const kpiSection = document.getElementById('kpiSection');
+
+            const kpis = [];
+
+            // Only add KPIs for data that exists
+            if (data.totals.gross_before_fa !== 'N/A') {
+                kpis.push({
+                    title: 'Total Gross Amount (Before FA)',
+                    value: data.totals.gross_before_fa,
+                    change: 'Total amount before financial aid deductions',
+                    class: 'revenue',
+                    icon: '📈'
+                });
+            }
+
+            if (data.totals.financial_aid !== 'N/A') {
+                const faPercent = data.totals.gross_before_fa !== 'N/A' ?
+                    `${((data.totals.financial_aid / data.totals.gross_before_fa) * 100).toFixed(1)}% of gross amount` :
+                    'Financial assistance provided';
+                kpis.push({
+                    title: 'Financial Aid',
+                    value: data.totals.financial_aid,
+                    change: faPercent,
+                    class: 'fa',
+                    icon: '🎓'
+                });
+            }
+
+            // Net Revenue - always available as it's calculated from actual data
+            kpis.push({
+                title: 'Net Revenue',
+                value: data.totals.net_revenue,
+                change: 'Total expected revenue (CUSD + LUSD converted)',
+                class: 'revenue',
+                icon: '💰'
+            });
+
+            // Collections - always available
+            kpis.push({
+                title: 'Total Collections',
+                value: data.totals.collections,
+                change: `${((data.totals.collections / data.totals.net_revenue) * 100).toFixed(1)}% of net revenue`,
+                class: 'collections',
+                icon: '💵'
+            });
+
+            // Outstanding - always available
+            kpis.push({
+                title: 'Total Outstanding',
+                value: data.totals.outstanding,
+                change: `${((data.totals.outstanding / data.totals.net_revenue) * 100).toFixed(1)}% of net revenue`,
+                class: 'outstanding',
+                icon: '📊'
+            });
+
+            // Only show expenses if available (mainly for 2024-2025)
+            if (data.totals.expenses && data.totals.expenses > 0) {
+                kpis.push({
+                    title: 'Operating Expenses',
+                    value: data.totals.expenses,
+                    change: `Total operating costs for ${data.year}`,
+                    class: 'expenses',
+                    icon: '💸'
+                });
+            }
+
+            // Only show reserves for 2024-2025
+            if (data.year === '2024-2025' && data.reserves && data.reserves.total > 0) {
+                kpis.push({
+                    title: 'Total Cash Reserves',
+                    value: data.reserves.total,
+                    change: `Available cash reserves across all semesters`,
+                    class: 'result',
+                    icon: '💎',
+                    borderColor: '#2ecc71'
+                });
+            }
+
+            kpiSection.innerHTML = kpis.map(kpi => {
+                const borderStyle = kpi.borderColor ? `style="border-color: ${kpi.borderColor};"` : '';
+                const iconStyle = kpi.borderColor ? `style="background: ${kpi.borderColor};"` : '';
+
+                return `
+                    <div class="kpi-card ${kpi.class}" ${borderStyle}>
+                        <div class="kpi-header">
+                            <div class="kpi-title">${kpi.title}</div>
+                            <div class="kpi-icon ${kpi.class}" ${iconStyle}>${kpi.icon}</div>
                         </div>
+                        <div class="kpi-value">${formatCurrency(kpi.value)}</div>
+                        <div class="kpi-change">${kpi.change}</div>
                     </div>
-                    <div class="semester-metrics">
-                        <!-- CUSD Row -->
-                        <div class="currency-row">
-                            <div class="metric-card cusd">
-                                <div class="metric-header">
-                                    <div class="metric-title">Expected Revenue</div>
-                                    <span class="currency-badge cusd">CUSD</span>
+                `;
+            }).join('');
+        }
+
+        // Update semester sections
+        function updateSemesterSections(data) {
+            const container = document.getElementById('semesterSections');
+            const semesters = Object.keys(data.semesters);
+            const shouldConvert = shouldConvertLUSD(data.year);
+
+            container.innerHTML = semesters.map((sem, index) => {
+                const semData = data.semesters[sem];
+                const semesterName = sem.replace(/_/g, ' ');
+
+                const borderColors = ['#3498db', '#9b59b6', '#e67e22'];
+                const borderColor = borderColors[index % 3];
+
+                return `
+                    <div class="semester-section">
+                        <div class="semester-header" style="border-left-color: ${borderColor}">
+                            <h2>${semesterName} • ${(semData.students || 0).toLocaleString()} Students</h2>
+                            <div class="performance-badge">
+                                <div class="badge-item ${getPerformanceClass(semData.total_paid_percent_cusd || 0)}">
+                                    ${getPerformanceIcon(semData.total_paid_percent_cusd || 0)} CUSD ${formatPercent(semData.total_paid_percent_cusd || 0)}
                                 </div>
-                                <div class="metric-value">${formatCurrency(data.total_expected_revenue_cusd)}</div>
-                                <div class="metric-subtitle">Collected: ${formatCurrency(data.total_paid_cusd)}</div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill ${getPerformanceClass(data.total_paid_percent_cusd)}" 
-                                         style="width: ${data.total_paid_percent_cusd}%"></div>
+                                ${semData.total_expected_revenue_lusd > 0 ? `
+                                <div class="badge-item ${getPerformanceClass(semData.total_paid_percent_lusd || 0)}">
+                                    ${getPerformanceIcon(semData.total_paid_percent_lusd || 0)} LUSD ${formatPercent(semData.total_paid_percent_lusd || 0)}
                                 </div>
-                                <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; font-weight: 600; color: ${data.total_paid_percent_cusd >= 75 ? '#27ae60' : data.total_paid_percent_cusd >= 50 ? '#f39c12' : '#e74c3c'}">
-                                    ${data.total_paid_percent_cusd.toFixed(1)}% Collected
-                                </div>
-                            </div>
-                            <div class="metric-card cusd">
-                                <div class="metric-header">
-                                    <div class="metric-title">Outstanding</div>
-                                    <span class="currency-badge cusd">CUSD</span>
-                                </div>
-                                <div class="metric-value">${formatCurrency(data.total_unpaid_cusd)}</div>
-                                <div class="metric-subtitle">${(100 - data.total_paid_percent_cusd).toFixed(1)}% uncollected</div>
-                            </div>
-                            <div class="metric-card">
-                                <div class="metric-header">
-                                    <div class="metric-title">Gross Amount (Before FA)</div>
-                                </div>
-                                <div class="metric-value">${formatCurrency(data.before_fa)}</div>
-                                <div class="metric-subtitle">FA: ${formatCurrency(data.fa_amounts)} (${((data.fa_amounts / data.before_fa) * 100).toFixed(1)}%)</div>
+                                ` : ''}
                             </div>
                         </div>
-                        <!-- LUSD Row -->
-                        <div class="currency-row">
-                            <div class="metric-card lusd">
-                                <div class="metric-header">
-                                    <div class="metric-title">Expected Revenue</div>
-                                    <span class="currency-badge lusd">LUSD</span>
+                        <div class="semester-metrics">
+                            <!-- USD/CUSD Row -->
+                            <div class="currency-row">
+                                <div class="metric-card cusd">
+                                    <div class="metric-header">
+                                        <div class="metric-title">Expected Revenue</div>
+                                        <span class="currency-badge cusd">CUSD</span>
+                                    </div>
+                                    <div class="metric-value">${formatCurrency(semData.total_expected_revenue_cusd || 0)}</div>
+                                    <div class="metric-subtitle">Collected: ${formatCurrency(semData.total_paid_cusd || 0)}</div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill ${getPerformanceClass(semData.total_paid_percent_cusd || 0)}"
+                                             style="width: ${semData.total_paid_percent_cusd || 0}%"></div>
+                                    </div>
                                 </div>
-                                <div class="metric-value">${formatLUSD(data.total_expected_revenue_lusd)}</div>
-                                <div class="metric-subtitle">Collected: ${formatLUSD(data.total_paid_lusd)}</div>
-                                <div class="metric-conversion">≈ ${formatCurrency(convertLUSDtoUSD(data.total_expected_revenue_lusd))}</div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill ${getPerformanceClass(data.total_paid_percent_lusd)}" 
-                                         style="width: ${data.total_paid_percent_lusd}%"></div>
+                                <div class="metric-card cusd">
+                                    <div class="metric-header">
+                                        <div class="metric-title">Outstanding</div>
+                                        <span class="currency-badge cusd">CUSD</span>
+                                    </div>
+                                    <div class="metric-value">${formatCurrency(semData.total_unpaid_cusd || 0)}</div>
+                                    <div class="metric-subtitle">${(100 - (semData.total_paid_percent_cusd || 0)).toFixed(1)}% uncollected</div>
                                 </div>
-                                <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; font-weight: 600; color: ${data.total_paid_percent_lusd >= 75 ? '#27ae60' : data.total_paid_percent_lusd >= 50 ? '#f39c12' : '#e74c3c'}">
-                                    ${data.total_paid_percent_lusd.toFixed(1)}% Collected
+                                <div class="metric-card">
+                                    <div class="metric-header">
+                                        <div class="metric-title">Gross Amount (Before FA)</div>
+                                    </div>
+                                    <div class="metric-value">${formatCurrency(semData.before_fa || 0)}</div>
+                                    <div class="metric-subtitle">FA: ${formatCurrency(semData.fa_amounts || 0)}</div>
                                 </div>
                             </div>
-                            <div class="metric-card lusd">
-                                <div class="metric-header">
-                                    <div class="metric-title">Outstanding</div>
-                                    <span class="currency-badge lusd">LUSD</span>
+                            ${semData.total_expected_revenue_lusd > 0 ? `
+                            <!-- LBP/LUSD Row -->
+                            <div class="currency-row">
+                                <div class="metric-card lusd">
+                                    <div class="metric-header">
+                                        <div class="metric-title">Expected Revenue</div>
+                                        <span class="currency-badge lusd">LUSD</span>
+                                    </div>
+                                    <div class="metric-value">${shouldConvert ? formatLUSD(semData.total_expected_revenue_lusd || 0) : formatCurrency(semData.total_expected_revenue_lusd || 0)}</div>
+                                    <div class="metric-subtitle">Collected: ${shouldConvert ? formatLUSD(semData.total_paid_lusd || 0) : formatCurrency(semData.total_paid_lusd || 0)}</div>
+                                    ${shouldConvert ? `
+                                    <div class="metric-conversion">≈ ${formatCurrency(convertLUSDtoUSD(semData.total_expected_revenue_lusd || 0, data.year))}</div>
+                                    ` : ''}
+                                    <div class="progress-bar">
+                                        <div class="progress-fill ${getPerformanceClass(semData.total_paid_percent_lusd || 0)}"
+                                             style="width: ${semData.total_paid_percent_lusd || 0}%"></div>
+                                    </div>
                                 </div>
-                                <div class="metric-value">${formatLUSD(data.total_unpaid_lusd)}</div>
-                                <div class="metric-subtitle">${(100 - data.total_paid_percent_lusd).toFixed(1)}% uncollected</div>
-                                <div class="metric-conversion">≈ ${formatCurrency(convertLUSDtoUSD(data.total_unpaid_lusd))}</div>
+                                <div class="metric-card lusd">
+                                    <div class="metric-header">
+                                        <div class="metric-title">Outstanding</div>
+                                        <span class="currency-badge lusd">LUSD</span>
+                                    </div>
+                                    <div class="metric-value">${shouldConvert ? formatLUSD(semData.total_unpaid_lusd || 0) : formatCurrency(semData.total_unpaid_lusd || 0)}</div>
+                                    <div class="metric-subtitle">${(100 - (semData.total_paid_percent_lusd || 0)).toFixed(1)}% uncollected</div>
+                                    ${shouldConvert ? `
+                                    <div class="metric-conversion">≈ ${formatCurrency(convertLUSDtoUSD(semData.total_unpaid_lusd || 0, data.year))}</div>
+                                    ` : ''}
+                                </div>
+                                <div style="grid-column: 3;"></div>
                             </div>
-                            <div style="grid-column: 3;"></div> <!-- Empty cell to maintain alignment -->
+                            ` : ''}
                         </div>
                     </div>
                 `;
-                
-                container.appendChild(section);
-            });
+            }).join('');
         }
 
-        // Create charts
-        function createCharts() {
-            createWaterfallChart();
-            createCollectionPerformanceChart();
-            createExpenseCategoriesChart();
-            createHeatmapChart();
-            createCurrencyMixChart();
-            createMonthlyReservesChart();
-        }
+        // Update reserves section
+        function updateReserves(reserves) {
+            const kpiSection = document.getElementById('reservesKpiSection');
 
-        function createWaterfallChart() {
-            const ctx = document.getElementById('waterfallChart').getContext('2d');
-            
-            const grossRevenue = 141002753;  // Total Before FA from data files
-            const fa = 45125147;
-            const netRevenue = 77416187;  // Total expected revenue with LUSD converted to USD
-            const expenses = 23489459;
-            const operatingResult = netRevenue - expenses;  // 53,926,728
-            
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Gross Revenue', 'Financial Aid', 'Net Revenue', 'Operating Expenses', 'Operating Result'],
-                    datasets: [{
-                        label: 'Amount',
-                        data: [grossRevenue, -fa, netRevenue, -expenses, operatingResult],
-                        backgroundColor: function(context) {
-                            const value = context.dataset.data[context.dataIndex];
-                            if (context.dataIndex === 0) return '#3498db';
-                            if (context.dataIndex === 2) return '#9b59b6';
-                            if (context.dataIndex === 4) return '#27ae60';
-                            return value < 0 ? '#e74c3c' : '#27ae60';
-                        },
-                        borderWidth: 0
-                    }]
+            const reserveKpis = [
+                {
+                    title: 'Fall Reserves',
+                    value: reserves.by_semester.Fall || 0,
+                    percentage: ((reserves.by_semester.Fall / reserves.total) * 100).toFixed(1),
+                    icon: '🍂',
+                    color: '#3498db',
+                    months: 'October - January'
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: {
-                        padding: {
-                            top: 30,
-                            bottom: 10
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        datalabels: {
-                            anchor: 'end',
-                            align: function(context) {
-                                // Use 'bottom' alignment for the first bar to prevent cutoff
-                                return context.dataIndex === 0 ? 'bottom' : 'top';
-                            },
-                            formatter: function(value) {
-                                return '$' + (Math.abs(value) / 1000000).toFixed(1) + 'M';
-                            },
-                            font: {
-                                weight: 'bold',
-                                size: 12
-                            },
-                            color: '#2c3e50',
-                            offset: 5
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const value = context.parsed.y;
-                                    return (value < 0 ? '-' : '') + formatCurrency(Math.abs(value));
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + (Math.abs(value)/1000000).toFixed(0) + 'M';
-                                }
-                            }
-                        }
-                    }
+                {
+                    title: 'Spring Reserves',
+                    value: reserves.by_semester.Spring || 0,
+                    percentage: ((reserves.by_semester.Spring / reserves.total) * 100).toFixed(1),
+                    icon: '🌸',
+                    color: '#9b59b6',
+                    months: 'February - June'
+                },
+                {
+                    title: 'Summer Reserves',
+                    value: reserves.by_semester.Summer || 0,
+                    percentage: ((reserves.by_semester.Summer / reserves.total) * 100).toFixed(1),
+                    icon: '☀️',
+                    color: '#e67e22',
+                    months: 'July - September'
                 }
-            });
+            ];
+
+            kpiSection.innerHTML = reserveKpis.map(kpi => `
+                <div class="kpi-card" style="border-color: ${kpi.color};">
+                    <div class="kpi-header">
+                        <div class="kpi-title">${kpi.title}</div>
+                        <div class="kpi-icon" style="background: ${kpi.color};">${kpi.icon}</div>
+                    </div>
+                    <div class="kpi-value" style="color: ${kpi.color};">${formatCurrency(kpi.value)}</div>
+                    <div class="kpi-change">${kpi.months}</div>
+                    <div class="progress-bar" style="margin-top: 15px;">
+                        <div class="progress-fill" style="width: ${kpi.percentage}%; background: ${kpi.color};"></div>
+                    </div>
+                    <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; color: #7f8c8d;">${kpi.percentage}% of total reserves</div>
+                </div>
+            `).join('');
         }
 
-        function createCollectionPerformanceChart() {
+        // Update charts
+        function updateCharts(data) {
+            const chartsSection = document.getElementById('chartsSection');
+
+            // Clear existing charts
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            charts = {};
+
+            // Create chart containers
+            let chartHTML = `
+                <div class="chart-card">
+                    <h3 class="chart-title">Collection Performance by Semester</h3>
+                    <div class="chart-container">
+                        <canvas id="collectionPerformanceChart"></canvas>
+                    </div>
+                </div>
+            `;
+
+            // Only add expense chart for 2024-2025
+            if (data.year === '2024-2025' && data.expenses && data.expenses.top_categories && data.expenses.top_categories.length > 0) {
+                chartHTML += `
+                    <div class="chart-card">
+                        <h3 class="chart-title">Top Expense Categories</h3>
+                        <div class="chart-container">
+                            <canvas id="expenseCategoriesChart"></canvas>
+                        </div>
+                    </div>
+                `;
+            }
+
+            chartsSection.innerHTML = chartHTML;
+
+            // Create charts
+            createCollectionPerformanceChart(data);
+
+            // Only create expense chart for 2024-2025
+            if (data.year === '2024-2025' && data.expenses && data.expenses.top_categories && data.expenses.top_categories.length > 0) {
+                createExpenseCategoriesChart(data);
+            }
+        }
+
+        // Create collection performance chart
+        function createCollectionPerformanceChart(data) {
             const ctx = document.getElementById('collectionPerformanceChart').getContext('2d');
-            const semesters = ['Fall_2024_2025', 'Spring_2024_2025', 'Summer_2024_2025'];
-            
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: semesters.map(s => s.split('_')[0]),
-                    datasets: [{
-                        label: 'Collection Rate %',
-                        data: semesters.map(sem => {
-                            const data = financialData.semesters[sem];
-                            return ((data.total_paid_lusd + data.total_paid_cusd) / 
-                                   (data.total_expected_revenue_lusd + data.total_expected_revenue_cusd) * 100);
-                        }),
-                        backgroundColor: function(context) {
-                            const value = context.parsed.y;
-                            if (value >= 75) return '#27ae60';
-                            if (value >= 50) return '#f39c12';
-                            return '#e74c3c';
-                        },
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        datalabels: {
-                            anchor: 'center',
-                            align: 'center',
-                            formatter: function(value) {
-                                return value.toFixed(1) + '%';
+            const semesters = Object.keys(data.semesters);
+            const shouldConvert = shouldConvertLUSD(data.year);
+
+            // For years with conversion (2024-2025, 2025-2026), combine totals
+            // For other years, show separate CUSD and LUSD collection rates
+            if (!shouldConvert && Object.values(data.semesters).some(s => s.total_expected_revenue_lusd > 0)) {
+                // Show separate bars for CUSD and LUSD
+                charts.collection = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: semesters.map(s => s.split('_')[0]),
+                        datasets: [
+                            {
+                                label: 'CUSD Collection Rate %',
+                                data: semesters.map(sem => {
+                                    const semData = data.semesters[sem];
+                                    return semData.total_paid_percent_cusd || 0;
+                                }),
+                                backgroundColor: '#3498db',
+                                borderWidth: 0
                             },
-                            color: 'white',
-                            font: {
-                                weight: 'bold',
-                                size: 14
+                            {
+                                label: 'LUSD Collection Rate %',
+                                data: semesters.map(sem => {
+                                    const semData = data.semesters[sem];
+                                    return semData.total_paid_percent_lusd || 0;
+                                }),
+                                backgroundColor: '#9b59b6',
+                                borderWidth: 0
                             }
-                        }
+                        ]
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            datalabels: {
+                                anchor: 'center',
+                                align: 'center',
+                                formatter: (value) => value > 0 ? value.toFixed(1) + '%' : '',
+                                color: 'white',
+                                font: { weight: 'bold', size: 12 }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: (value) => value + '%'
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+            } else {
+                // For 2024-2025 and 2025-2026, combine totals with conversion
+                charts.collection = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: semesters.map(s => s.split('_')[0]),
+                        datasets: [{
+                            label: 'Collection Rate %',
+                            data: semesters.map(sem => {
+                                const semData = data.semesters[sem];
+                                if (shouldConvert) {
+                                    // Convert LUSD to USD for 2024-2025 and 2025-2026
+                                    const totalExpected = (semData.total_expected_revenue_cusd || 0) +
+                                                        convertLUSDtoUSD(semData.total_expected_revenue_lusd || 0, data.year);
+                                    const totalPaid = (semData.total_paid_cusd || 0) +
+                                                    convertLUSDtoUSD(semData.total_paid_lusd || 0, data.year);
+                                    return totalExpected > 0 ? (totalPaid / totalExpected * 100) : 0;
+                                } else {
+                                    // Just use CUSD for years with no LUSD data
+                                    return semData.total_paid_percent_cusd || 0;
+                                }
+                            }),
+                            backgroundColor: function(context) {
+                                const value = context.parsed.y;
+                                if (value >= 75) return '#27ae60';
+                                if (value >= 50) return '#f39c12';
+                                return '#e74c3c';
+                            },
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            datalabels: {
+                                anchor: 'center',
+                                align: 'center',
+                                formatter: (value) => value.toFixed(1) + '%',
+                                color: 'white',
+                                font: { weight: 'bold', size: 14 }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: (value) => value + '%'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
         }
 
-        function createExpenseCategoriesChart() {
+        // Create expense categories chart
+        function createExpenseCategoriesChart(data) {
             const ctx = document.getElementById('expenseCategoriesChart').getContext('2d');
-            const categories = financialData.expenses.top_categories;
+            const categories = data.expenses.top_categories;
             const total = categories.reduce((sum, cat) => sum + cat[1], 0);
-            
-            new Chart(ctx, {
+
+            charts.expenses = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: categories.map(cat => cat[0]),
                     datasets: [{
                         data: categories.map(cat => cat[1]),
-                        backgroundColor: ['#e74c3c', '#f39c12', '#9b59b6', '#e67e22', '#3498db', '#1abc9c'],
+                        backgroundColor: ['#e74c3c', '#f39c12', '#9b59b6', '#e67e22', '#3498db', '#1abc9c', '#95a5a6'],
                         borderWidth: 2,
                         borderColor: '#fff'
                     }]
@@ -1165,371 +1888,84 @@
                             position: 'right',
                             labels: {
                                 padding: 15,
-                                font: {
-                                    size: 12
-                                },
-                                generateLabels: function(chart) {
-                                    const data = chart.data;
-                                    return data.labels.map((label, i) => {
-                                        const value = data.datasets[0].data[i];
-                                        const percentage = (value / total * 100).toFixed(1);
-                                        return {
-                                            text: label + ' (' + percentage + '%)',
-                                            fillStyle: data.datasets[0].backgroundColor[i],
-                                            hidden: false,
-                                            index: i
-                                        };
-                                    });
-                                }
+                                font: { size: 11 }
                             }
                         },
                         datalabels: {
-                            formatter: function(value, context) {
+                            formatter: (value, context) => {
                                 const percentage = (value / total * 100).toFixed(1);
-                                if (percentage < 5) return ''; // Hide labels for small slices
-                                return percentage + '%';
-                            },
-                            color: function(context) {
-                                // Use dark color for light backgrounds, white for dark
-                                const dataIndex = context.dataIndex;
-                                if (dataIndex === 1 || dataIndex === 4 || dataIndex === 5) {
-                                    return '#2c3e50'; // Dark color for yellow/light blue
-                                }
-                                return 'white';
-                            },
-                            font: {
-                                weight: 'bold',
-                                size: 14
-                            },
-                            anchor: 'center',
-                            align: 'center',
-                            offset: 0
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const percentage = ((context.parsed * 100) / total).toFixed(1);
-                                    return context.label + ': $' + (context.parsed/1000000).toFixed(1) + 'M (' + percentage + '%)';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createGaugeChart() {
-            const ctx = document.getElementById('gaugeChart').getContext('2d');
-            const semesters = ['Fall_2024_2025', 'Spring_2024_2025', 'Summer_2024_2025'];
-            
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: semesters.map(s => s.split('_')[0] + ' 2024-25'),
-                    datasets: [{
-                        label: 'LUSD Collection Rate',
-                        data: semesters.map(sem => financialData.semesters[sem].total_paid_percent_lusd),
-                        backgroundColor: '#3498db',
-                        borderColor: '#2980b9',
-                        borderWidth: 2,
-                        barPercentage: 0.7
-                    }, {
-                        label: 'CUSD Collection Rate',
-                        data: semesters.map(sem => financialData.semesters[sem].total_paid_percent_cusd),
-                        backgroundColor: '#9b59b6',
-                        borderColor: '#8e44ad',
-                        borderWidth: 2,
-                        barPercentage: 0.7
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                padding: 20,
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        },
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'end',
-                            formatter: function(value) {
-                                return value.toFixed(1) + '%';
-                            },
-                            font: {
-                                weight: 'bold',
-                                size: 14
-                            },
-                            color: function(context) {
-                                const value = context.dataset.data[context.dataIndex];
-                                if (value >= 75) return '#27ae60';
-                                if (value >= 50) return '#f39c12';
-                                return '#e74c3c';
-                            }
-                        },
-                        annotation: {
-                            annotations: {
-                                line1: {
-                                    type: 'line',
-                                    yMin: 80,
-                                    yMax: 80,
-                                    borderColor: '#27ae60',
-                                    borderWidth: 2,
-                                    borderDash: [5, 5],
-                                    label: {
-                                        content: 'Target: 80%',
-                                        enabled: true,
-                                        position: 'start',
-                                        backgroundColor: '#27ae60',
-                                        color: 'white',
-                                        font: {
-                                            size: 12,
-                                            weight: 'bold'
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                },
-                                font: {
-                                    size: 12
-                                }
-                            },
-                            grid: {
-                                drawBorder: false
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createHeatmapChart() {
-            const ctx = document.getElementById('heatmapChart').getContext('2d');
-            const semesters = ['Fall_2024_2025', 'Spring_2024_2025', 'Summer_2024_2025'];
-            
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: semesters.map(s => s.split('_')[0]),
-                    datasets: [{
-                        label: 'LUSD Outstanding (USD)',
-                        data: semesters.map(sem => convertLUSDtoUSD(financialData.semesters[sem].total_unpaid_lusd)),
-                        backgroundColor: '#3498db',
-                        stack: 'outstanding'
-                    }, {
-                        label: 'CUSD Outstanding',
-                        data: semesters.map(sem => financialData.semesters[sem].total_unpaid_cusd),
-                        backgroundColor: '#9b59b6',
-                        stack: 'outstanding'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    indexAxis: 'y',
-                    plugins: {
-                        datalabels: {
-                            display: true,
-                            formatter: function(value, context) {
-                                const semesterIndex = context.dataIndex;
-                                const datasetIndex = context.datasetIndex;
-                                const semester = semesters[semesterIndex];
-                                const data = financialData.semesters[semester];
-                                let percentage;
-                                let displayValue;
-                                
-                                if (datasetIndex === 0) { // LUSD
-                                    percentage = (100 - data.total_paid_percent_lusd).toFixed(1);
-                                    displayValue = '$' + (value / 1000000).toFixed(1) + 'M USD';
-                                } else { // CUSD
-                                    percentage = (100 - data.total_paid_percent_cusd).toFixed(1);
-                                    displayValue = '$' + (value / 1000000).toFixed(1) + 'M';
-                                }
-                                
-                                return displayValue + '\n(' + percentage + '%)';
+                                return percentage > 5 ? percentage + '%' : '';
                             },
                             color: 'white',
-                            font: {
-                                weight: 'bold',
-                                size: 11
-                            },
-                            textAlign: 'center'
-                        }
-                    },
-                    scales: {
-                        x: {
-                            stacked: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + (value/1000000).toFixed(0) + 'M';
-                                }
-                            }
-                        },
-                        y: {
-                            stacked: true
+                            font: { weight: 'bold', size: 12 }
                         }
                     }
                 }
             });
         }
 
-        function createCurrencyMixChart() {
-            const ctx = document.getElementById('currencyMixChart').getContext('2d');
-            
-            const totalLUSD = 30274027;  // Total LUSD revenue (unconverted)
-            const totalLUSDinUSD = convertLUSDtoUSD(totalLUSD);  // Convert to USD
-            const totalCUSD = 65603579;
-            const total = totalLUSDinUSD + totalCUSD;  // Total in USD
-            
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['LUSD Revenue (USD)', 'CUSD Revenue'],
-                    datasets: [{
-                        data: [totalLUSDinUSD, totalCUSD],
-                        backgroundColor: ['#3498db', '#9b59b6'],
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 15,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        datalabels: {
-                            formatter: function(value, context) {
-                                const percentage = (value / total * 100).toFixed(1);
-                                return '$' + (value/1000000).toFixed(1) + 'M\n(' + percentage + '%)';
-                            },
-                            color: 'white',
-                            font: {
-                                weight: 'bold',
-                                size: 14
-                            },
-                            textAlign: 'center'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const percentage = ((context.parsed * 100) / total).toFixed(1);
-                                    return context.label + ': ' + formatCurrency(context.parsed) + ' (' + percentage + '%)';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+        // Update summary table
+        function updateSummaryTable(data) {
+            const table = document.getElementById('summaryTable');
+
+            const surplus = data.totals.collections - data.totals.expenses;
+            const expectedSurplus = data.totals.net_revenue - data.totals.expenses;
+
+            table.innerHTML = `
+                <tr>
+                    <td><strong>Academic Year</strong></td>
+                    <td class="number"><strong>${data.year}</strong></td>
+                </tr>
+                <tr>
+                    <td><strong>Total Gross Amount (Before FA)</strong></td>
+                    <td class="number"><strong>${formatCurrency(data.totals.gross_before_fa)}</strong></td>
+                </tr>
+                <tr>
+                    <td>Financial Aid Distributed</td>
+                    <td class="number negative">-${formatCurrency(data.totals.financial_aid)}</td>
+                </tr>
+                <tr style="background-color: #e8f5e8;">
+                    <td><strong>Net Revenue</strong></td>
+                    <td class="number"><strong>${formatCurrency(data.totals.net_revenue)}</strong></td>
+                </tr>
+                <tr>
+                    <td>Operating Expenses</td>
+                    <td class="number negative">-${formatCurrency(data.totals.expenses)}</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><strong>Expected Operating Result</strong></td>
+                    <td class="number ${expectedSurplus >= 0 ? 'positive' : 'negative'}">
+                        <strong>${expectedSurplus >= 0 ? '+' : '-'}${formatCurrency(Math.abs(expectedSurplus))}</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="padding-top: 20px;"><strong>Cash Position Analysis</strong></td>
+                </tr>
+                <tr>
+                    <td>Total Collections to Date</td>
+                    <td class="number">${formatCurrency(data.totals.collections)}</td>
+                </tr>
+                <tr>
+                    <td>Operating Expenses</td>
+                    <td class="number negative">-${formatCurrency(data.totals.expenses)}</td>
+                </tr>
+                <tr style="background-color: #d4edda;">
+                    <td><strong>Cash Operating Result</strong></td>
+                    <td class="number ${surplus >= 0 ? 'positive' : 'negative'}">
+                        <strong>${surplus >= 0 ? '+' : '-'}${formatCurrency(Math.abs(surplus))}</strong>
+                    </td>
+                </tr>
+            `;
         }
 
-        function createMonthlyReservesChart() {
-            const ctx = document.getElementById('monthlyReservesChart').getContext('2d');
-            const monthlyData = financialData.reserves.monthly;
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: monthlyData.map(d => d.month),
-                    datasets: [{
-                        label: 'Cash Reserves',
-                        data: monthlyData.map(d => d.amount),
-                        backgroundColor: monthlyData.map(d => {
-                            if (d.semester === 'Fall') return '#3498db';
-                            if (d.semester === 'Spring') return '#9b59b6';
-                            return '#e67e22';
-                        }),
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'top',
-                            formatter: function(value) {
-                                return '$' + (value / 1000000).toFixed(1) + 'M';
-                            },
-                            font: {
-                                weight: 'bold',
-                                size: 10
-                            },
-                            color: '#2c3e50'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                afterLabel: function(context) {
-                                    const dataIndex = context.dataIndex;
-                                    const semester = monthlyData[dataIndex].semester;
-                                    const percentage = (monthlyData[dataIndex].amount / financialData.reserves.total * 100).toFixed(1);
-                                    return 'Semester: ' + semester + '\n' + percentage + '% of total reserves';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return '$' + (value/1000000).toFixed(0) + 'M';
-                                }
-                            },
-                            grid: {
-                                drawBorder: false
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Initialize dashboard
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            createSemesterSections();
-            createCharts();
+            initializeYearSelector();
+
+            // Auto-select the most recent year
+            const years = Object.keys(HARDCODED_DATA);
+            const mostRecentYear = years[years.length - 1];
+            selectYear(mostRecentYear);
         });
     </script>
 </body>
