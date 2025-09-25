@@ -1565,6 +1565,17 @@
                 });
             }
 
+            // Gross Revenue (After FA) - always available
+            if (data.totals.gross_after_fa !== undefined && data.totals.gross_after_fa !== 'N/A') {
+                kpis.push({
+                    title: 'Gross Revenue (After FA)',
+                    value: data.totals.gross_after_fa,
+                    change: 'Total revenue after financial aid deductions',
+                    class: 'revenue',
+                    icon: '💵'
+                });
+            }
+
             // Net Revenue - this is the USD equivalent value after converting LUSD to USD
             // For years before 2024, LUSD had much lower value, so net revenue < gross_after_fa
             let revenueChangeText;
@@ -1594,10 +1605,17 @@
                 }
             }
 
+            // Calculate percentage of net revenue from gross after FA
+            let netRevenuePercent = '';
+            if (data.totals.gross_after_fa && data.totals.gross_after_fa > 0) {
+                const percentage = (data.totals.net_revenue / data.totals.gross_after_fa * 100).toFixed(1);
+                netRevenuePercent = ` • ${percentage}% of Gross After FA`;
+            }
+
             kpis.push({
                 title: 'Net Revenue (USD Equivalent)',
                 value: data.totals.net_revenue,
-                change: revenueChangeText,
+                change: revenueChangeText + netRevenuePercent,
                 class: 'revenue',
                 icon: '💰'
             });
@@ -2016,6 +2034,7 @@
             const years = Object.keys(HARDCODED_DATA).sort();
             const grossBeforeFA = [];
             const financialAid = [];
+            const grossRevenue = [];
             const netRevenue = [];
             const collections = [];
             const outstanding = [];
@@ -2025,6 +2044,7 @@
                 const yearData = HARDCODED_DATA[year];
                 grossBeforeFA.push(yearData.totals.gross_before_fa || 0);
                 financialAid.push(yearData.totals.financial_aid || 0);
+                grossRevenue.push(yearData.totals.gross_after_fa || 0);
                 netRevenue.push(yearData.totals.net_revenue || 0);
                 collections.push(yearData.totals.collections || 0);
                 outstanding.push(yearData.totals.outstanding || 0);
@@ -2094,6 +2114,14 @@
                             data: financialAid,
                             borderColor: '#e74c3c',
                             backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Gross Revenue (After FA)',
+                            data: grossRevenue,
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
                             borderWidth: 3,
                             tension: 0.2
                         }
