@@ -1320,6 +1320,24 @@
             return value.toFixed(1) + '%';
         }
 
+        // Calculate actual net revenue (USD equivalent) for a given year
+        function calculateActualNetRevenue(data) {
+            if (shouldConvertLUSD(data.year)) {
+                // For 2024-2025 and 2025-2026, calculate CUSD + converted LUSD
+                let cusdTotal = 0;
+                let lusdTotal = 0;
+                Object.values(data.semesters).forEach(sem => {
+                    cusdTotal += sem.total_expected_revenue_cusd || 0;
+                    lusdTotal += sem.total_expected_revenue_lusd || 0;
+                });
+                const convertedLUSD = convertLUSDtoUSD(lusdTotal, data.year);
+                return cusdTotal + convertedLUSD;
+            } else {
+                // For other years, use the data's net_revenue
+                return data.totals.net_revenue;
+            }
+        }
+
         function getPerformanceClass(rate) {
             if (rate >= 75) return 'good';
             if (rate >= 50) return 'warning';
@@ -1408,8 +1426,9 @@
         function updateAlertBanner(data) {
             // Only show financial performance if we have expense data (2024-2025)
             if (data.totals.expenses && data.totals.expenses > 0) {
+                const actualNetRevenue = calculateActualNetRevenue(data);
                 const surplus = data.totals.collections - data.totals.expenses;
-                const expectedSurplus = data.totals.net_revenue - data.totals.expenses;
+                const expectedSurplus = actualNetRevenue - data.totals.expenses;
 
                 let title, text, bannerClass;
 
@@ -1477,6 +1496,7 @@
             // Net Revenue - this is the USD equivalent value after converting LUSD to USD
             // For years before 2024, LUSD had much lower value, so net revenue < gross_after_fa
             let revenueChangeText;
+            const actualNetRevenue = calculateActualNetRevenue(data);
 
             // Calculate CUSD and LUSD totals from semesters for display
             let cusdTotal = 0;
@@ -1487,9 +1507,10 @@
             });
 
             if (shouldConvertLUSD(data.year)) {
-                // For 2024-2025 and 2025-2026, we can show the breakdown since we know the conversion
+                // For 2024-2025 and 2025-2026, show the breakdown
+                const convertedLUSD = convertLUSDtoUSD(lusdTotal, data.year);
+
                 if (lusdTotal > 0) {
-                    const convertedLUSD = convertLUSDtoUSD(lusdTotal, data.year);
                     revenueChangeText = `CUSD: ${formatCurrency(cusdTotal)} + LUSD: ${formatLUSD(lusdTotal)} (→ ${formatCurrency(convertedLUSD)} USD)`;
                 } else {
                     revenueChangeText = `CUSD: ${formatCurrency(cusdTotal)}`;
@@ -1506,13 +1527,13 @@
             // Calculate percentage of net revenue from gross after FA
             let netRevenuePercent = '';
             if (data.totals.gross_after_fa && data.totals.gross_after_fa > 0) {
-                const percentage = (data.totals.net_revenue / data.totals.gross_after_fa * 100).toFixed(1);
+                const percentage = (actualNetRevenue / data.totals.gross_after_fa * 100).toFixed(1);
                 netRevenuePercent = ` • ${percentage}% of Gross After FA`;
             }
 
             kpis.push({
                 title: 'Net Revenue (USD Equivalent)',
-                value: data.totals.net_revenue,
+                value: actualNetRevenue,
                 change: revenueChangeText + netRevenuePercent,
                 class: 'revenue',
                 icon: '💰'
@@ -1522,7 +1543,7 @@
             kpis.push({
                 title: 'Total Collections',
                 value: data.totals.collections,
-                change: `${((data.totals.collections / data.totals.net_revenue) * 100).toFixed(1)}% of net revenue`,
+                change: `${((data.totals.collections / actualNetRevenue) * 100).toFixed(1)}% of net revenue`,
                 class: 'collections',
                 icon: '💵'
             });
@@ -1531,7 +1552,7 @@
             kpis.push({
                 title: 'Total Outstanding',
                 value: data.totals.outstanding,
-                change: `${((data.totals.outstanding / data.totals.net_revenue) * 100).toFixed(1)}% of net revenue`,
+                change: `${((data.totals.outstanding / actualNetRevenue) * 100).toFixed(1)}% of net revenue`,
                 class: 'outstanding',
                 icon: '📊'
             });
@@ -1663,6 +1684,26 @@
                                     ${shouldConvert ? `
                                     <div class="metric-conversion">≈ ${formatCurrency(convertLUSDtoUSD(semData.total_unpaid_lusd || 0, data.year))}</div>
                                     ` : ''}
+                                </div>
+                                <div style="grid-column: 3;"></div>
+                            </div>
+                            <!-- Total Expected Revenue Row -->
+                            <div class="currency-row" style="margin-top: 20px;">
+                                <div class="metric-card" style="border-left-color: #16a085;">
+                                    <div class="metric-header">
+                                        <div class="metric-title">Total Expected Revenue</div>
+                                        <span class="currency-badge" style="background: #d5f4e6; color: #117a65;">COMBINED</span>
+                                    </div>
+                                    <div class="metric-value" style="color: #16a085;">${formatCurrency((semData.total_expected_revenue_cusd || 0) + (semData.total_expected_revenue_lusd || 0))}</div>
+                                    <div class="metric-subtitle">CUSD + LUSD (nominal)</div>
+                                </div>
+                                <div class="metric-card" style="border-left-color: #27ae60;">
+                                    <div class="metric-header">
+                                        <div class="metric-title">Total Expected Revenue (USD Equivalent)</div>
+                                        <span class="currency-badge" style="background: #d4efdf; color: #196f3d;">USD</span>
+                                    </div>
+                                    <div class="metric-value" style="color: #27ae60;">${formatCurrency((semData.total_expected_revenue_cusd || 0) + convertLUSDtoUSD(semData.total_expected_revenue_lusd || 0, data.year))}</div>
+                                    <div class="metric-subtitle">CUSD + LUSD converted to USD</div>
                                 </div>
                                 <div style="grid-column: 3;"></div>
                             </div>
@@ -2184,8 +2225,9 @@
         function updateSummaryTable(data) {
             const table = document.getElementById('summaryTable');
 
+            const actualNetRevenue = calculateActualNetRevenue(data);
             const surplus = data.totals.collections - data.totals.expenses;
-            const expectedSurplus = data.totals.net_revenue - data.totals.expenses;
+            const expectedSurplus = actualNetRevenue - data.totals.expenses;
 
             table.innerHTML = `
                 <tr>
@@ -2201,8 +2243,8 @@
                     <td class="number negative">-${formatCurrency(data.totals.financial_aid)}</td>
                 </tr>
                 <tr style="background-color: #e8f5e8;">
-                    <td><strong>Net Revenue</strong></td>
-                    <td class="number"><strong>${formatCurrency(data.totals.net_revenue)}</strong></td>
+                    <td><strong>Net Revenue (USD Equivalent)</strong></td>
+                    <td class="number"><strong>${formatCurrency(actualNetRevenue)}</strong></td>
                 </tr>
                 <tr>
                     <td>Operating Expenses</td>
