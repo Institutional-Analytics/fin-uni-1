@@ -1769,9 +1769,14 @@
             const semesters = Object.keys(data.semesters);
             const shouldConvert = shouldConvertLUSD(data.year);
 
+            // Check if any semester has LUSD data
+            const hasLUSDData = Object.values(data.semesters).some(s =>
+                s.total_expected_revenue_lusd && s.total_expected_revenue_lusd > 0
+            );
+
             // For years with conversion (2024-2025, 2025-2026), combine totals
-            // For other years, show separate CUSD and LUSD collection rates
-            if (!shouldConvert && Object.values(data.semesters).some(s => s.total_expected_revenue_lusd > 0)) {
+            // For other years, show separate CUSD and LUSD collection rates if both exist
+            if (!shouldConvert && hasLUSDData) {
                 // Show separate bars for CUSD and LUSD
                 charts.collection = new Chart(ctx, {
                     type: 'bar',
@@ -1826,7 +1831,7 @@
                     }
                 });
             } else {
-                // For 2024-2025 and 2025-2026, combine totals with conversion
+                // For 2024-2025, 2025-2026 (with conversion), or years with only CUSD data
                 charts.collection = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -1835,7 +1840,7 @@
                             label: 'Collection Rate %',
                             data: semesters.map(sem => {
                                 const semData = data.semesters[sem];
-                                if (shouldConvert) {
+                                if (shouldConvert && hasLUSDData) {
                                     // Convert LUSD to USD for 2024-2025 and 2025-2026
                                     const totalExpected = (semData.total_expected_revenue_cusd || 0) +
                                                         convertLUSDtoUSD(semData.total_expected_revenue_lusd || 0, data.year);
@@ -1843,7 +1848,7 @@
                                                     convertLUSDtoUSD(semData.total_paid_lusd || 0, data.year);
                                     return totalExpected > 0 ? (totalPaid / totalExpected * 100) : 0;
                                 } else {
-                                    // Just use CUSD for years with no LUSD data
+                                    // Just use CUSD for years with no LUSD data or when not converting
                                     return semData.total_paid_percent_cusd || 0;
                                 }
                             }),
