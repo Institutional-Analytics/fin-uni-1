@@ -1729,6 +1729,15 @@ const HARDCODED_DATA = {
 
             const reserveKpis = [
                 {
+                    title: 'Total Reserves',
+                    value: reserves.total || 0,
+                    percentage: null,
+                    icon: '💎',
+                    color: '#2ecc71',
+                    months: 'All semesters combined',
+                    isTotal: true
+                },
+                {
                     title: 'Fall Reserves',
                     value: reserves.by_semester.Fall || 0,
                     percentage: ((reserves.by_semester.Fall / reserves.total) * 100).toFixed(1),
@@ -1762,10 +1771,12 @@ const HARDCODED_DATA = {
                     </div>
                     <div class="kpi-value" style="color: ${kpi.color};">${formatCurrency(kpi.value)}</div>
                     <div class="kpi-change">${kpi.months}</div>
+                    ${!kpi.isTotal ? `
                     <div class="progress-bar" style="margin-top: 15px;">
                         <div class="progress-fill" style="width: ${kpi.percentage}%; background: ${kpi.color};"></div>
                     </div>
                     <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; color: #7f8c8d;">${kpi.percentage}% of total reserves</div>
+                    ` : ''}
                 </div>
             `).join('');
         }
