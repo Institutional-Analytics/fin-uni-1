@@ -619,7 +619,21 @@ const HARDCODED_DATA = {
         "total_expected_revenue_lusd": 10314487.0,
         "total_expected_revenue_cusd": 38349517.0,
         "before_fa": 65938498.62,
-        "semester": "Fall_2025_2026"
+        "semester": "Fall_2025_2026",
+        "vouchers": {
+          "lusd": [
+            {"name": "V1", "expected": 3222063, "collected": 1066080, "outstanding": 2155983, "percent": 33.09},
+            {"name": "V2", "expected": 2518766, "collected": 22684, "outstanding": 2496082, "percent": 0.90},
+            {"name": "V3", "expected": 2243317, "collected": 8240, "outstanding": 2235077, "percent": 0.37},
+            {"name": "V4", "expected": 2313108, "collected": 7357, "outstanding": 2305751, "percent": 0.32}
+          ],
+          "cusd": [
+            {"name": "V1", "expected": 9880946, "collected": 4007168, "outstanding": 5873778, "percent": 40.55},
+            {"name": "V2", "expected": 9051507, "collected": 941995, "outstanding": 8109512, "percent": 10.41},
+            {"name": "V3", "expected": 8601941, "collected": 92748, "outstanding": 8509193, "percent": 1.08},
+            {"name": "V4", "expected": 8879237, "collected": 43112, "outstanding": 8836125, "percent": 0.49}
+          ]
+        }
       }
     },
     "year": "2025-2026",
@@ -1643,7 +1657,7 @@ const HARDCODED_DATA = {
                                         <span class="currency-badge cusd">CUSD</span>
                                     </div>
                                     <div class="metric-value">${formatCurrency(semData.total_expected_revenue_cusd || 0)}</div>
-                                    <div class="metric-subtitle">Collected: ${formatCurrency(semData.total_paid_cusd || 0)}</div>
+                                    <div class="metric-subtitle">Collected: ${formatCurrency(semData.total_paid_cusd || 0)} (${formatPercent(semData.total_paid_percent_cusd || 0)})</div>
                                     <div class="progress-bar">
                                         <div class="progress-fill ${getPerformanceClass(semData.total_paid_percent_cusd || 0)}"
                                              style="width: ${semData.total_paid_percent_cusd || 0}%"></div>
@@ -1674,7 +1688,7 @@ const HARDCODED_DATA = {
                                         <span class="currency-badge lusd">LUSD</span>
                                     </div>
                                     <div class="metric-value">${shouldConvert ? formatLUSD(semData.total_expected_revenue_lusd || 0) : formatCurrency(semData.total_expected_revenue_lusd || 0)}</div>
-                                    <div class="metric-subtitle">Collected: ${shouldConvert ? formatLUSD(semData.total_paid_lusd || 0) : formatCurrency(semData.total_paid_lusd || 0)}</div>
+                                    <div class="metric-subtitle">Collected: ${shouldConvert ? formatLUSD(semData.total_paid_lusd || 0) : formatCurrency(semData.total_paid_lusd || 0)} (${formatPercent(semData.total_paid_percent_lusd || 0)})</div>
                                     ${shouldConvert ? `
                                     <div class="metric-conversion">≈ ${formatCurrency(convertLUSDtoUSD(semData.total_expected_revenue_lusd || 0, data.year))}</div>
                                     ` : ''}
@@ -1715,6 +1729,102 @@ const HARDCODED_DATA = {
                                     <div class="metric-subtitle">CUSD + LUSD converted to USD</div>
                                 </div>
                                 <div style="grid-column: 3;"></div>
+                            </div>
+                            ` : ''}
+
+                            <!-- Voucher Breakdown Section -->
+                            ${semData.vouchers ? `
+                            <div style="margin-top: 30px;">
+                                <h3 style="color: #2c3e50; font-size: 1.3rem; margin-bottom: 20px; text-align: center;">📋 Voucher Collection Breakdown</h3>
+
+                                <!-- CUSD Vouchers -->
+                                <div style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                                    <h4 style="color: #7b1fa2; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                        <span class="currency-badge cusd">CUSD</span>
+                                        <span>Voucher Collections</span>
+                                    </h4>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                        ${semData.vouchers.cusd.map(v => `
+                                            <div style="background: white; border-radius: 8px; padding: 15px; border-left: 4px solid ${v.percent >= 25 ? '#27ae60' : v.percent >= 10 ? '#f39c12' : '#e74c3c'};">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                                    <span style="font-weight: 700; color: #2c3e50; font-size: 1.1rem;">${v.name}</span>
+                                                    <span style="font-weight: 700; color: ${v.percent >= 25 ? '#27ae60' : v.percent >= 10 ? '#f39c12' : '#e74c3c'}; font-size: 1.1rem;">${v.percent.toFixed(2)}%</span>
+                                                </div>
+                                                <div style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 5px;">Expected: ${formatCurrency(v.expected)}</div>
+                                                <div style="font-size: 0.85rem; color: #27ae60; margin-bottom: 5px;">Collected: ${formatCurrency(v.collected)}</div>
+                                                <div style="font-size: 0.85rem; color: #e74c3c;">Outstanding: ${formatCurrency(v.outstanding)}</div>
+                                                <div class="progress-bar" style="margin-top: 10px;">
+                                                    <div class="progress-fill ${getPerformanceClass(v.percent)}" style="width: ${v.percent}%"></div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <!-- LUSD Vouchers -->
+                                ${semData.vouchers.lusd ? `
+                                <div style="background: #f8f9fa; border-radius: 10px; padding: 20px;">
+                                    <h4 style="color: #1976d2; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                        <span class="currency-badge lusd">LUSD</span>
+                                        <span>Voucher Collections</span>
+                                    </h4>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                        ${semData.vouchers.lusd.map(v => `
+                                            <div style="background: white; border-radius: 8px; padding: 15px; border-left: 4px solid ${v.percent >= 25 ? '#27ae60' : v.percent >= 10 ? '#f39c12' : '#e74c3c'};">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                                    <span style="font-weight: 700; color: #2c3e50; font-size: 1.1rem;">${v.name}</span>
+                                                    <span style="font-weight: 700; color: ${v.percent >= 25 ? '#27ae60' : v.percent >= 10 ? '#f39c12' : '#e74c3c'}; font-size: 1.1rem;">${v.percent.toFixed(2)}%</span>
+                                                </div>
+                                                <div style="font-size: 0.85rem; color: #7f8c8d; margin-bottom: 5px;">Expected: ${shouldConvert ? formatLUSD(v.expected) : formatCurrency(v.expected)}</div>
+                                                <div style="font-size: 0.85rem; color: #27ae60; margin-bottom: 5px;">Collected: ${shouldConvert ? formatLUSD(v.collected) : formatCurrency(v.collected)}</div>
+                                                <div style="font-size: 0.85rem; color: #e74c3c;">Outstanding: ${shouldConvert ? formatLUSD(v.outstanding) : formatCurrency(v.outstanding)}</div>
+                                                ${shouldConvert ? `<div style="font-size: 0.85rem; color: #2980b9; margin-top: 5px;">≈ ${formatCurrency(convertLUSDtoUSD(v.collected, data.year))} collected</div>` : ''}
+                                                <div class="progress-bar" style="margin-top: 10px;">
+                                                    <div class="progress-fill ${getPerformanceClass(v.percent)}" style="width: ${v.percent}%"></div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                ` : ''}
+
+                                <!-- Combined Voucher Totals -->
+                                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; padding: 20px; margin-top: 20px;">
+                                    <h4 style="color: white; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                                        <span style="background: white; color: #667eea; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 700;">COMBINED</span>
+                                        <span>Total Voucher Collections (CUSD + LUSD)</span>
+                                    </h4>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                                        ${semData.vouchers.cusd.map((cusdV, index) => {
+                                            const lusdV = semData.vouchers.lusd[index];
+                                            const totalExpected = cusdV.expected + convertLUSDtoUSD(lusdV.expected, data.year);
+                                            const totalCollected = cusdV.collected + convertLUSDtoUSD(lusdV.collected, data.year);
+                                            const totalOutstanding = cusdV.outstanding + convertLUSDtoUSD(lusdV.outstanding, data.year);
+                                            const totalPercent = (cusdV.percent + lusdV.percent) / 2;
+
+                                            return `
+                                            <div style="background: rgba(255, 255, 255, 0.95); border-radius: 8px; padding: 18px; border-left: 4px solid ${totalPercent >= 25 ? '#27ae60' : totalPercent >= 10 ? '#f39c12' : '#e74c3c'}; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                                    <span style="font-weight: 700; color: #2c3e50; font-size: 1.2rem;">${cusdV.name} Total</span>
+                                                    <span style="font-weight: 700; color: ${totalPercent >= 25 ? '#27ae60' : totalPercent >= 10 ? '#f39c12' : '#e74c3c'}; font-size: 1.2rem;">${totalPercent.toFixed(2)}%</span>
+                                                </div>
+                                                <div style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 6px; font-weight: 600;">Expected: ${formatCurrency(totalExpected)}</div>
+                                                <div style="font-size: 0.9rem; color: #27ae60; margin-bottom: 6px; font-weight: 600;">Collected: ${formatCurrency(totalCollected)}</div>
+                                                <div style="font-size: 0.9rem; color: #e74c3c; font-weight: 600;">Outstanding: ${formatCurrency(totalOutstanding)}</div>
+                                                <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ecf0f1;">
+                                                    <div style="font-size: 0.8rem; color: #95a5a6;">
+                                                        CUSD: ${formatCurrency(cusdV.collected)} (${cusdV.percent.toFixed(1)}%)<br>
+                                                        LUSD: ${shouldConvert ? formatLUSD(lusdV.collected) : formatCurrency(lusdV.collected)} (${lusdV.percent.toFixed(1)}%)
+                                                    </div>
+                                                </div>
+                                                <div class="progress-bar" style="margin-top: 12px; height: 8px;">
+                                                    <div class="progress-fill ${getPerformanceClass(totalPercent)}" style="width: ${Math.min(totalPercent, 100)}%"></div>
+                                                </div>
+                                            </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
                             </div>
                             ` : ''}
                         </div>
