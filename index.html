@@ -571,8 +571,11 @@
                 <div style="margin: 40px 0 30px 0;">
                     <h2 style="text-align: center; color: #2c3e50; font-size: 2rem; margin-bottom: 30px;">Cash Reserves by Semester</h2>
                 </div>
-                <div class="kpi-section" id="reservesKpiSection" style="margin-bottom: 50px;">
+                <div class="kpi-section" id="reservesKpiSection" style="margin-bottom: 30px;">
                     <!-- Reserves KPI cards will be populated here -->
+                </div>
+                <div id="reservesMonthlyComparison" style="display: none;">
+                    <!-- Monthly comparison table will be populated here -->
                 </div>
             </div>
 
@@ -735,7 +738,77 @@ const HARDCODED_DATA = {
         "Spring": 0,
         "Summer": 0
       },
-      "total": 14390986.329988852
+      "total": 14390986.329988852,
+      "prev_year": {
+        "monthly": [
+          {
+            "month": "October",
+            "amount": 1545338.5171131883,
+            "semester": "Fall"
+          },
+          {
+            "month": "November",
+            "amount": 1460873.7246314704,
+            "semester": "Fall"
+          },
+          {
+            "month": "December",
+            "amount": 3774687.9130434785,
+            "semester": "Fall"
+          },
+          {
+            "month": "January",
+            "amount": 7689745.593620466,
+            "semester": "Fall"
+          },
+          {
+            "month": "February",
+            "amount": 4467591.433667782,
+            "semester": "Spring"
+          },
+          {
+            "month": "March",
+            "amount": 3016262.562090893,
+            "semester": "Spring"
+          },
+          {
+            "month": "April",
+            "amount": 2651571.4069119287,
+            "semester": "Spring"
+          },
+          {
+            "month": "May",
+            "amount": 4609937.712374582,
+            "semester": "Spring"
+          },
+          {
+            "month": "June",
+            "amount": 2983709.509476031,
+            "semester": "Spring"
+          },
+          {
+            "month": "July",
+            "amount": 887359.1828316611,
+            "semester": "Summer"
+          },
+          {
+            "month": "August",
+            "amount": 561318.8405797102,
+            "semester": "Summer"
+          },
+          {
+            "month": "September",
+            "amount": 4114080.8584169457,
+            "semester": "Summer"
+          }
+        ],
+        "by_semester": {
+          "Fall": 14470645.748408604,
+          "Spring": 17729072.62452122,
+          "Summer": 5562758.881828317
+        },
+        "total": 37762477.254758134
+      }
     }
   },
   "2024-2025": {
@@ -3726,11 +3799,13 @@ const HARDCODED_DATA = {
         // Update reserves section
         function updateReserves(reserves) {
             const kpiSection = document.getElementById('reservesKpiSection');
+            const prev = reserves.prev_year || null;
 
             const reserveKpis = [
                 {
                     title: 'Total Reserves',
                     value: reserves.total || 0,
+                    prevValue: prev ? (prev.total || 0) : null,
                     percentage: null,
                     icon: '💎',
                     color: '#2ecc71',
@@ -3740,6 +3815,7 @@ const HARDCODED_DATA = {
                 {
                     title: 'Fall Reserves',
                     value: reserves.by_semester.Fall || 0,
+                    prevValue: prev ? (prev.by_semester.Fall || 0) : null,
                     percentage: ((reserves.by_semester.Fall / reserves.total) * 100).toFixed(1),
                     icon: '🍂',
                     color: '#3498db',
@@ -3748,6 +3824,7 @@ const HARDCODED_DATA = {
                 {
                     title: 'Spring Reserves',
                     value: reserves.by_semester.Spring || 0,
+                    prevValue: prev ? (prev.by_semester.Spring || 0) : null,
                     percentage: ((reserves.by_semester.Spring / reserves.total) * 100).toFixed(1),
                     icon: '🌸',
                     color: '#9b59b6',
@@ -3756,12 +3833,31 @@ const HARDCODED_DATA = {
                 {
                     title: 'Summer Reserves',
                     value: reserves.by_semester.Summer || 0,
+                    prevValue: prev ? (prev.by_semester.Summer || 0) : null,
                     percentage: ((reserves.by_semester.Summer / reserves.total) * 100).toFixed(1),
                     icon: '☀️',
                     color: '#e67e22',
                     months: 'July - September'
                 }
             ];
+
+            function buildPrevYearHtml(kpi) {
+                if (kpi.prevValue === null) return '';
+                const diff = kpi.value - kpi.prevValue;
+                const pctChange = kpi.prevValue !== 0 ? ((diff / kpi.prevValue) * 100).toFixed(1) : (kpi.value > 0 ? '100.0' : '0.0');
+                const isUp = diff >= 0;
+                const arrow = isUp ? '▲' : '▼';
+                const changeColor = isUp ? '#27ae60' : '#e74c3c';
+                return `
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ecf0f1;">
+                        <div style="font-size: 0.8rem; color: #95a5a6; margin-bottom: 4px;">Previous Year</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 1rem; font-weight: 600; color: #7f8c8d;">${formatCurrency(kpi.prevValue)}</span>
+                            <span style="font-size: 0.85rem; font-weight: 600; color: ${changeColor};">${arrow} ${Math.abs(pctChange)}%</span>
+                        </div>
+                    </div>
+                `;
+            }
 
             kpiSection.innerHTML = reserveKpis.map(kpi => `
                 <div class="kpi-card" style="border-color: ${kpi.color};">
@@ -3777,8 +3873,91 @@ const HARDCODED_DATA = {
                     </div>
                     <div style="text-align: right; margin-top: 5px; font-size: 0.85rem; color: #7f8c8d;">${kpi.percentage}% of total reserves</div>
                     ` : ''}
+                    ${buildPrevYearHtml(kpi)}
                 </div>
             `).join('');
+
+            // Build monthly comparison table
+            const compDiv = document.getElementById('reservesMonthlyComparison');
+            if (prev && reserves.monthly && reserves.monthly.length > 0) {
+                const monthOrder = ['October','November','December','January','February','March','April','May','June','July','August','September'];
+                const semesterOf = m => ({'October':'Fall','November':'Fall','December':'Fall','January':'Fall','February':'Spring','March':'Spring','April':'Spring','May':'Spring','June':'Spring','July':'Summer','August':'Summer','September':'Summer'}[m] || '');
+                const semesterColor = s => ({'Fall':'#3498db','Spring':'#9b59b6','Summer':'#e67e22'}[s] || '#7f8c8d');
+
+                // Build lookup for previous year by month
+                const prevByMonth = {};
+                (prev.monthly || []).forEach(m => { prevByMonth[m.month] = m.amount; });
+
+                // Only show months that exist in current year
+                const currentMonths = reserves.monthly.map(m => m.month);
+                const orderedMonths = monthOrder.filter(m => currentMonths.includes(m));
+
+                let rows = orderedMonths.map(month => {
+                    const curr = reserves.monthly.find(m => m.month === month);
+                    const currVal = curr ? curr.amount : 0;
+                    const prevVal = prevByMonth[month] || 0;
+                    const diff = currVal - prevVal;
+                    const pctChange = prevVal !== 0 ? ((diff / prevVal) * 100).toFixed(1) : (currVal > 0 ? 'N/A' : '0.0');
+                    const isUp = diff >= 0;
+                    const arrow = isUp ? '▲' : '▼';
+                    const changeColor = isUp ? '#27ae60' : '#e74c3c';
+                    const sem = semesterOf(month);
+                    const sColor = semesterColor(sem);
+
+                    return `<tr>
+                        <td style="padding: 12px 16px; font-weight: 600; color: #2c3e50; border-bottom: 1px solid #ecf0f1;">
+                            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${sColor}; margin-right: 8px;"></span>${month}
+                        </td>
+                        <td style="padding: 12px 16px; text-align: right; font-weight: 600; color: #2c3e50; border-bottom: 1px solid #ecf0f1;">${formatCurrency(currVal)}</td>
+                        <td style="padding: 12px 16px; text-align: right; color: #7f8c8d; border-bottom: 1px solid #ecf0f1;">${formatCurrency(prevVal)}</td>
+                        <td style="padding: 12px 16px; text-align: right; font-weight: 600; color: ${changeColor}; border-bottom: 1px solid #ecf0f1;">
+                            ${pctChange === 'N/A' ? 'N/A' : arrow + ' ' + Math.abs(pctChange) + '%'}
+                        </td>
+                    </tr>`;
+                }).join('');
+
+                // Totals row using only the months that exist in current year
+                const currTotal = orderedMonths.reduce((s, m) => { const c = reserves.monthly.find(x => x.month === m); return s + (c ? c.amount : 0); }, 0);
+                const prevTotal = orderedMonths.reduce((s, m) => s + (prevByMonth[m] || 0), 0);
+                const totalDiff = currTotal - prevTotal;
+                const totalPct = prevTotal !== 0 ? ((totalDiff / prevTotal) * 100).toFixed(1) : 'N/A';
+                const totalUp = totalDiff >= 0;
+                const totalArrow = totalUp ? '▲' : '▼';
+                const totalColor = totalUp ? '#27ae60' : '#e74c3c';
+
+                compDiv.innerHTML = `
+                    <div style="max-width: 800px; margin: 0 auto 50px auto; background: white; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow: hidden;">
+                        <div style="padding: 20px 24px; background: linear-gradient(135deg, #2c3e50, #34495e); color: white;">
+                            <h3 style="margin: 0; font-size: 1.2rem;">Monthly Reserves Comparison</h3>
+                            <p style="margin: 5px 0 0 0; font-size: 0.85rem; opacity: 0.8;">Current year vs. previous year (same months)</p>
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f8f9fa;">
+                                    <th style="padding: 12px 16px; text-align: left; font-size: 0.8rem; text-transform: uppercase; color: #7f8c8d; letter-spacing: 0.5px;">Month</th>
+                                    <th style="padding: 12px 16px; text-align: right; font-size: 0.8rem; text-transform: uppercase; color: #7f8c8d; letter-spacing: 0.5px;">Current Year</th>
+                                    <th style="padding: 12px 16px; text-align: right; font-size: 0.8rem; text-transform: uppercase; color: #7f8c8d; letter-spacing: 0.5px;">Previous Year</th>
+                                    <th style="padding: 12px 16px; text-align: right; font-size: 0.8rem; text-transform: uppercase; color: #7f8c8d; letter-spacing: 0.5px;">Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows}
+                                <tr style="background: #f8f9fa; font-weight: 700;">
+                                    <td style="padding: 14px 16px; color: #2c3e50; border-top: 2px solid #2c3e50;">Total</td>
+                                    <td style="padding: 14px 16px; text-align: right; color: #2c3e50; border-top: 2px solid #2c3e50;">${formatCurrency(currTotal)}</td>
+                                    <td style="padding: 14px 16px; text-align: right; color: #7f8c8d; border-top: 2px solid #2c3e50;">${formatCurrency(prevTotal)}</td>
+                                    <td style="padding: 14px 16px; text-align: right; color: ${totalColor}; border-top: 2px solid #2c3e50;">
+                                        ${totalPct === 'N/A' ? 'N/A' : totalArrow + ' ' + Math.abs(totalPct) + '%'}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                compDiv.style.display = 'block';
+            } else {
+                compDiv.style.display = 'none';
+            }
         }
 
         // Update charts
